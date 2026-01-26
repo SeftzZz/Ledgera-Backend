@@ -7,9 +7,28 @@ use CodeIgniter\Model;
 class JobModel extends Model
 {
     protected $table = 'jobs';
+    protected $primaryKey = 'id';
+
     protected $allowedFields = [
-        'hotel_name','position','job_date','start_time','end_time','fee','location','description','status',
-        'created_at','created_by','updated_at','updated_by','deleted_at','deleted_by'
+        'hotel_id',
+        'position',
+        'job_date_start',
+        'job_date_end',
+        'start_time',
+        'end_time',
+        'category',
+        'fee',
+        'location',
+        'description',
+        'requirement_skill',
+        'status',
+        'created_at',
+        'created_by',
+        'updated_at',
+        'updated_by',
+        'deleted_at',
+        'deleted_by'
     ];
-    protected $useTimestamps = true;
+
+    protected $useTimestamps = false;
 }

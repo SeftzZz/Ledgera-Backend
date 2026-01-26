@@ -43,6 +43,7 @@ $routes->group('api', ['filter' => 'jwt'], function($routes) {
     $routes->get('jobs', 'Api\JobController::index');
     $routes->get('jobs/(:num)', 'Api\JobController::show/$1');
     $routes->post('jobs/(:num)/apply', 'Api\JobController::apply/$1');
+    $routes->post('jobs', 'Api\JobController::create');
 });
 
 

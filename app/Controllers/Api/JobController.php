@@ -90,4 +90,80 @@ class JobController extends BaseController
             'message' => 'Apply success'
         ]);
     }
+
+    /**
+     * ============================
+     * CREATE JOB (POSTMAN)
+     * ============================
+     * POST /api/jobs
+     */
+    public function create()
+    {
+        // Ambil data JSON / form-data
+        $data = $this->request->getJSON(true) 
+             ?? $this->request->getPost();
+
+        // =========================
+        // VALIDASI WAJIB
+        // =========================
+        $required = [
+            'hotel_id',
+            'position',
+            'job_date_start',
+            'job_date_end',
+            'start_time',
+            'end_time',
+            'fee'
+        ];
+
+        foreach ($required as $field) {
+            if (empty($data[$field])) {
+                return $this->response
+                    ->setStatusCode(422)
+                    ->setJSON([
+                        'message' => "Field {$field} is required"
+                    ]);
+            }
+        }
+
+        // =========================
+        // DATA INSERT
+        // =========================
+        $insert = [
+            'hotel_id'         => $data['hotel_id'],
+            'position'         => $data['position'],
+            'job_date_start'   => $data['job_date_start'],
+            'job_date_end'     => $data['job_date_end'],
+            'start_time'       => $data['start_time'],
+            'end_time'         => $data['end_time'],
+            'category'         => $data['category'] ?? 'daily_worker',
+            'fee'              => $data['fee'],
+            'location'         => $data['location'] ?? null,
+            'description'      => $data['description'] ?? null,
+            'requirement_skill'=> $data['requirement_skill'] ?? null,
+            'status'           => $data['status'] ?? 'open',
+            'created_at'       => date('Y-m-d H:i:s')
+        ];
+
+        $this->job->insert($insert);
+
+        $jobs = $this->job
+            ->select('
+                jobs.*,
+                hotel_name,
+                hotels.logo  AS hotel_logo
+            ')
+            ->join('hotels', 'hotels.id = jobs.hotel_id', 'left')
+            ->where('jobs.status', 'open')
+            ->orderBy('jobs.job_date_start', 'ASC')
+            ->findAll();
+
+        service('wsEmitter')->jobsUpdated($jobs);
+
+        return $this->response->setJSON([
+            'message' => 'Job created successfully',
+            'job_id'  => $this->job->getInsertID()
+        ]);
+    }
+
 }

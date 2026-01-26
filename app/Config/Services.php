@@ -3,6 +3,7 @@
 namespace Config;
 
 use CodeIgniter\Config\BaseService;
+use App\Services\WsEmitter;
 
 /**
  * Services Configuration file.
@@ -29,4 +30,13 @@ class Services extends BaseService
      *     return new \CodeIgniter\Example();
      * }
      */
+
+    public static function wsEmitter(bool $getShared = true)
+    {
+        if ($getShared) {
+            return static::getSharedInstance('wsEmitter');
+        }
+
+        return new WsEmitter();
+    }
 }

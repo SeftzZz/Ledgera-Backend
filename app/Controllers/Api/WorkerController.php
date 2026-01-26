@@ -9,6 +9,7 @@ use App\Models\SkillModel;
 use App\Models\WorkerSkillModel;
 use App\Models\WorkerExperienceModel;
 use App\Models\WorkerDocumentModel;
+use App\Models\JobModel;
 use App\Models\JobApplicationModel;
 
 class WorkerController extends BaseController
@@ -18,7 +19,8 @@ class WorkerController extends BaseController
     protected $skill;
     protected $workerSkill;
     protected $experience;
-
+    protected $job;
+    protected $apply;
 
     public function __construct()
     {
@@ -27,6 +29,8 @@ class WorkerController extends BaseController
         $this->skill       = new SkillModel();
         $this->workerSkill = new WorkerSkillModel();
         $this->experience  = new WorkerExperienceModel();
+        $this->job         = new JobModel();
+        $this->apply       = new JobApplicationModel();
     }
 
     /**
@@ -294,11 +298,40 @@ class WorkerController extends BaseController
     {
         $user = $this->request->user;
 
-        $model = new JobApplicationModel();
+        if (!$user || $user->role !== 'worker') {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON(['message' => 'Access denied']);
+        }
 
-        return $this->response->setJSON(
-            $model->workerHistory($user->id)
-        );
+        $data = $this->apply->workerHistory($user->id) ?? [];
+
+        $pending = $accepted = $completed = 0;
+
+        foreach ($data as $row) {
+            $status = $row['status'] ?? $row['application_status'] ?? null;
+
+            if (!$status) continue;
+
+            switch ($status) {
+                case 'pending':
+                    $pending++;
+                    break;
+                case 'accepted':
+                    $accepted++;
+                    break;
+                case 'completed':
+                    $completed++;
+                    break;
+            }
+        }
+
+        return $this->response->setJSON([
+            'pending'   => $pending,
+            'accepted'  => $accepted,
+            'completed' => $completed,
+            'total'     => count($data)
+        ]);
     }
 
     public function applicationDetail($applicationId)
@@ -328,6 +361,53 @@ class WorkerController extends BaseController
         return $this->response->setJSON($data);
     }
 
+    /**
+     * ============================
+     * LIST JOBS FOR WORKER
+     * ============================
+     * GET /api/worker/jobs
+     */
+    public function jobs()
+    {
+        $user = $this->request->user;
 
+        if (!$user || $user->role !== 'worker') {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON(['message' => 'Access denied']);
+        }
+
+        // =========================
+        // AMBIL JOB + HOTEL
+        // =========================
+        $jobs = $this->job
+            ->select('
+                jobs.*,
+                hotels.hotel_name,
+                hotels.logo as hotel_logo,
+            ')
+            ->join('hotels', 'hotels.id = jobs.hotel_id', 'left')
+            ->where('jobs.status', 'open')
+            ->orderBy('jobs.job_date_start', 'ASC')
+            ->findAll();
+
+        $jobs = $jobs ?? [];
+
+        // =========================
+        // JOB YANG SUDAH DIAPPLY
+        // =========================
+        $appliedJobs = (array) $this->apply
+            ->where('user_id', $user->id)
+            ->findColumn('job_id');
+
+        // =========================
+        // FLAG is_applied
+        // =========================
+        foreach ($jobs as &$job) {
+            $job['is_applied'] = in_array($job['id'], $appliedJobs);
+        }
+
+        return $this->response->setJSON($jobs);
+    }
 
 }

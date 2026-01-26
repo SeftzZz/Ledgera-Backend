@@ -37,6 +37,7 @@ $routes->group('api', ['filter' => 'jwt'], function($routes) {
     $routes->get('worker/applications/(:num)','Api\WorkerController::applicationDetail/$1');
     $routes->post('worker/rating', 'Api\RatingController::submit');
     $routes->get('worker/ratings', 'Api\RatingController::myRatings');
+    $routes->get('worker/most-popular', 'Api\WorkerController::mostPopular');
 
     $routes->get('skills', 'Api\WorkerController::skills');
 

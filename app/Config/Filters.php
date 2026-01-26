@@ -36,7 +36,7 @@ class Filters extends BaseFilters
         'csrf'          => \CodeIgniter\Filters\CSRF::class,
         'toolbar'       => \CodeIgniter\Filters\DebugToolbar::class,
         'jwt'           => \App\Filters\JwtFilter::class,
-        'cors'          => \App\Filters\Cors::class,
+        'cors'          => \CodeIgniter\Filters\Cors::class,
     ];
 
     /**

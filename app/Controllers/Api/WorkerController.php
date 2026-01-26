@@ -388,7 +388,7 @@ class WorkerController extends BaseController
             ')
             ->join('hotels', 'hotels.id = jobs.hotel_id', 'left')
             ->where('jobs.status', 'open')
-            ->orderBy('jobs.job_date_start', 'ASC')
+            ->orderBy('jobs.job_date_start', 'DESC')
             ->findAll();
 
         $jobs = $jobs ?? [];

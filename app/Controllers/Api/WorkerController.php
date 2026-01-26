@@ -410,4 +410,40 @@ class WorkerController extends BaseController
         return $this->response->setJSON($jobs);
     }
 
+    /**
+     * ============================
+     * MOST POPULAR JOBS
+     * ============================
+     * GET /api/jobs/most-popular
+     */
+    public function mostPopular()
+    {
+        $user = $this->request->user;
+
+        if (!$user || $user->role !== 'worker') {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON(['message' => 'Access denied']);
+        }
+
+        $db = \Config\Database::connect();
+
+        $jobs = $db->table('job_applications ja')
+            ->select('
+                j.*,
+                h.hotel_name,
+                h.logo AS hotel_logo,
+                COUNT(ja.id) AS total_apply
+            ')
+            ->join('jobs j', 'j.id = ja.job_id')
+            ->join('hotels h', 'h.id = j.hotel_id', 'left')
+            ->groupBy('j.id')
+            ->orderBy('total_apply', 'DESC')
+            ->limit(5)
+            ->get()
+            ->getResultArray();
+
+        return $this->response->setJSON($jobs);
+    }
+
 }

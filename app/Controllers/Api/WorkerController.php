@@ -589,14 +589,18 @@ class WorkerController extends BaseController
             }
 
             $name = 'checkin_' . $data['job_id'] . '_' . $user->id . '_' . time() . '.jpg';
-            $path = 'public/uploads/attendance/' . $name;
 
-            if (!is_dir('public/uploads/attendance')) {
-                mkdir('public/uploads/attendance', 0777, true);
+            // 🔥 PATH FISIK (SERVER)
+            $dir = FCPATH . 'uploads/attendance/';
+
+            // 🔥 PATH UNTUK DB (RELATIVE URL)
+            $photoPath = 'uploads/attendance/' . $name;
+
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
             }
 
-            file_put_contents($path, $imageData);
-            $photoPath = 'uploads/attendance/' . $name;
+            file_put_contents($dir . $name, $imageData);
         }
 
         $this->attendance->insert([
@@ -662,15 +666,16 @@ class WorkerController extends BaseController
                     ->setJSON(['message' => 'Invalid selfie data']);
             }
 
-            $name = 'checkin_' . $data['job_id'] . '_' . $user->id . '_' . time() . '.jpg';
-            $path = 'public/uploads/attendance/' . $name;
+            $name = 'checkout_' . $data['job_id'] . '_' . $user->id . '_' . time() . '.jpg';
 
-            if (!is_dir('public/uploads/attendance')) {
-                mkdir('public/uploads/attendance', 0777, true);
+            $dir = FCPATH . 'uploads/attendance/';
+            $photoPath = 'uploads/attendance/' . $name;
+
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
             }
 
-            file_put_contents($path, $imageData);
-            $photoPath = 'uploads/attendance/' . $name;
+            file_put_contents($dir . $name, $imageData);
         }
 
         $this->attendance->insert([

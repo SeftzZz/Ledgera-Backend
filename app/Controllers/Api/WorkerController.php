@@ -11,6 +11,7 @@ use App\Models\WorkerExperienceModel;
 use App\Models\WorkerDocumentModel;
 use App\Models\JobModel;
 use App\Models\JobApplicationModel;
+use App\Models\JobAttendanceModel;
 
 class WorkerController extends BaseController
 {
@@ -21,6 +22,7 @@ class WorkerController extends BaseController
     protected $experience;
     protected $job;
     protected $apply;
+    protected $attendance;
 
     public function __construct()
     {
@@ -31,6 +33,7 @@ class WorkerController extends BaseController
         $this->experience  = new WorkerExperienceModel();
         $this->job         = new JobModel();
         $this->apply       = new JobApplicationModel();
+        $this->attendance = new JobAttendanceModel();
     }
 
     /**
@@ -294,6 +297,37 @@ class WorkerController extends BaseController
         );
     }
 
+    public function applicationList()
+    {
+        $user = $this->request->user;
+
+        if (!$user || $user->role !== 'worker') {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON(['message' => 'Access denied']);
+        }
+
+        $model = new JobApplicationModel();
+
+        $data = $model
+            ->select(
+                'job_applications.id as application_id,
+                 job_applications.status,
+                 job_applications.applied_at,
+                 jobs.id as job_id,
+                 jobs.position,
+                 jobs.fee,
+                 jobs.location,
+                 jobs.hotel_id'
+            )
+            ->join('jobs', 'jobs.id = job_applications.job_id')
+            ->where('job_applications.user_id', $user->id)
+            ->orderBy('job_applications.applied_at', 'DESC')
+            ->findAll();
+
+        return $this->response->setJSON($data);
+    }
+
     public function applications()
     {
         $user = $this->request->user;
@@ -444,6 +478,216 @@ class WorkerController extends BaseController
             ->getResultArray();
 
         return $this->response->setJSON($jobs);
+    }
+
+    /**
+     * ============================
+     * LIST ATTENDANCE (SCHEDULE)
+     * ============================
+     * GET /api/worker/attendance
+     * optional: ?date=YYYY-MM-DD
+     */
+    public function attendance()
+    {
+        $user = $this->request->user;
+
+        if ($user->role !== 'worker') {
+            return $this->response
+                ->setStatusCode(403)
+                ->setJSON(['message' => 'Access denied']);
+        }
+
+        $date = $this->request->getGet('date');
+
+        $builder = $this->attendance
+            ->select('
+                job_attendances.*,
+                jobs.position,
+                jobs.job_date_start,
+                jobs.job_date_end,
+                hotels.hotel_name
+            ')
+            ->join('jobs', 'jobs.id = job_attendances.job_id')
+            ->join('hotels', 'hotels.id = jobs.hotel_id', 'left')
+            ->where('job_attendances.user_id', $user->id);
+
+        if ($date) {
+            $builder->where('DATE(job_attendances.created_at)', $date);
+        }
+
+        $data = $builder
+            ->orderBy('job_attendances.created_at', 'ASC')
+            ->findAll();
+
+        return $this->response->setJSON($data);
+    }
+
+    /**
+     * ============================
+     * ATTENDANCE BY JOB
+     * ============================
+     * GET /api/worker/attendance/job/{job_id}
+     */
+    public function attendanceByJob($jobId)
+    {
+        $user = $this->request->user;
+
+        $data = $this->attendance
+            ->where('job_id', $jobId)
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'ASC')
+            ->findAll();
+
+        return $this->response->setJSON($data);
+    }
+
+    /**
+     * ============================
+     * CHECK-IN
+     * ============================
+     * POST /api/worker/attendance/checkin
+     */
+    public function checkin()
+    {
+        $user = $this->request->user;
+        $data = $this->request->getPost();
+
+        // validasi minimal
+        foreach (['job_id','application_id','latitude','longitude'] as $f) {
+            if (empty($data[$f])) {
+                return $this->response
+                    ->setStatusCode(400)
+                    ->setJSON(['message' => "$f is required"]);
+            }
+        }
+
+        // ❌ cegah double check-in
+        $exists = $this->attendance
+            ->where('job_id', $data['job_id'])
+            ->where('application_id', $data['application_id'])
+            ->where('user_id', $user->id)
+            ->where('type', 'checkin')
+            ->where('DATE(created_at)', date('Y-m-d'))
+            ->first();
+
+        if ($exists) {
+            return $this->response
+                ->setStatusCode(409)
+                ->setJSON(['message' => 'Already checked-in today']);
+        }
+
+        $selfieBase64 = $data['selfie'] ?? null;
+        $photoPath = null;
+
+        if ($selfieBase64) {
+            $imageData = base64_decode($selfieBase64);
+
+            if ($imageData === false) {
+                return $this->response
+                    ->setStatusCode(400)
+                    ->setJSON(['message' => 'Invalid selfie data']);
+            }
+
+            $name = 'checkin_' . $data['job_id'] . '_' . $user->id . '_' . time() . '.jpg';
+            $path = 'public/uploads/attendance/' . $name;
+
+            if (!is_dir('public/uploads/attendance')) {
+                mkdir('public/uploads/attendance', 0777, true);
+            }
+
+            file_put_contents($path, $imageData);
+            $photoPath = 'uploads/attendance/' . $name;
+        }
+
+        $this->attendance->insert([
+            'job_id'        => $data['job_id'],
+            'application_id'=> $data['application_id'],
+            'user_id'       => $user->id,
+            'type'          => 'checkin',
+            'latitude'      => $data['latitude'],
+            'longitude'     => $data['longitude'],
+            'photo_path'    => $photoPath,
+            'device_info'   => $this->request->getUserAgent()->getAgentString(),
+            'created_by'    => $user->id
+        ]);
+
+        return $this->response->setJSON([
+            'message' => 'Check-in success'
+        ]);
+    }
+
+    /**
+     * ============================
+     * CHECK-OUT
+     * ============================
+     * POST /api/worker/attendance/checkout
+     */
+    public function checkout()
+    {
+        $user = $this->request->user;
+        $data = $this->request->getPost();
+
+        foreach (['job_id','application_id','latitude','longitude'] as $f) {
+            if (empty($data[$f])) {
+                return $this->response
+                    ->setStatusCode(400)
+                    ->setJSON(['message' => "$f is required"]);
+            }
+        }
+
+        // wajib sudah check-in
+        $checkin = $this->attendance
+            ->where('job_id', $data['job_id'])
+            ->where('application_id', $data['application_id'])
+            ->where('user_id', $user->id)
+            ->where('type', 'checkin')
+            ->where('DATE(created_at)', date('Y-m-d'))
+            ->first();
+
+        if (!$checkin) {
+            return $this->response
+                ->setStatusCode(409)
+                ->setJSON(['message' => 'You must check-in first']);
+        }
+
+        $selfieBase64 = $data['selfie'] ?? null;
+        $photoPath = null;
+
+        if ($selfieBase64) {
+            $imageData = base64_decode($selfieBase64);
+
+            if ($imageData === false) {
+                return $this->response
+                    ->setStatusCode(400)
+                    ->setJSON(['message' => 'Invalid selfie data']);
+            }
+
+            $name = 'checkin_' . $data['job_id'] . '_' . $user->id . '_' . time() . '.jpg';
+            $path = 'public/uploads/attendance/' . $name;
+
+            if (!is_dir('public/uploads/attendance')) {
+                mkdir('public/uploads/attendance', 0777, true);
+            }
+
+            file_put_contents($path, $imageData);
+            $photoPath = 'uploads/attendance/' . $name;
+        }
+
+        $this->attendance->insert([
+            'job_id'        => $data['job_id'],
+            'application_id'=> $data['application_id'],
+            'user_id'       => $user->id,
+            'type'          => 'checkout',
+            'latitude'      => $data['latitude'],
+            'longitude'     => $data['longitude'],
+            'photo_path'    => $photoPath,
+            'device_info'   => $this->request->getUserAgent()->getAgentString(),
+            'created_by'    => $user->id
+        ]);
+
+        return $this->response->setJSON([
+            'message' => 'Check-out success'
+        ]);
     }
 
 }

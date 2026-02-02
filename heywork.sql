@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 02, 2026 at 12:26 AM
+-- Generation Time: Feb 02, 2026 at 05:08 PM
 -- Server version: 10.11.10-MariaDB-log
 -- PHP Version: 8.3.27
 
@@ -157,7 +157,8 @@ CREATE TABLE `job_attendances` (
 INSERT INTO `job_attendances` (`id`, `job_id`, `application_id`, `user_id`, `type`, `latitude`, `longitude`, `photo_path`, `device_info`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
 (1, 2, 2, 2, 'checkin', -6.5944441, 106.7891234, 'uploads/attendance/checkin_1_2_1705654800.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 07:28:45', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
 (2, 2, 2, 2, 'checkout', -6.5944510, 106.7891102, 'uploads/attendance/checkout_1_2_1705689600.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 17:32:10', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
-(3, 3, 3, 3, 'checkin', -6.6015006, 106.7942450, 'uploads/attendance/checkin_3_3_1769945735.jpg', 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36 Edg/144.0.0.0', '2026-02-01 18:35:35', 3, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0);
+(3, 3, 3, 3, 'checkin', -6.6015006, 106.7942450, 'uploads/attendance/checkin_3_3_1769945735.jpg', 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36 Edg/144.0.0.0', '2026-02-01 18:35:35', 3, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
+(4, 3, 3, 3, 'checkin', -6.6015006, 106.7942450, 'uploads/attendance/checkin_3_3_1770015659.jpg', 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36 Edg/144.0.0.0', '2026-02-02 14:00:59', 3, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0);
 
 -- --------------------------------------------------------
 
@@ -401,7 +402,12 @@ INSERT INTO `refresh_tokens` (`id`, `user_id`, `token`, `expires_at`, `created_a
 (205, 3, '4ea3229356eda6b8892de72777a605f354900d06e3a3f8374a6f5b91efc052c74f8a14738607c0096c3860b850a2535158d72fa8decff1561cf2073b2f96f3bf', '2026-03-03 12:13:24', '2026-02-01 12:13:24'),
 (206, 3, '1b246667f62dad1d7c229cee716d4316e93ec814feb908b7d1f2912fb56d0774c7aeac63d49347e8795a87021b09318b514a259f98aa410898c9ee0d42b2cb6e', '2026-03-03 12:28:31', '2026-02-01 12:28:31'),
 (207, 3, '7e8c7b7243e537428e59d5e8e35606058033508fadf900322ca27060239a07f1bc9ce7c7b8affb39f41a26f480404d6fbe73269756891ea05f7e8c2ecda322d1', '2026-03-03 12:44:44', '2026-02-01 12:44:44'),
-(208, 3, '7b5a89ec998cab7712863efaf0baf701e545f890c54f98c922c877fb85c62e30166f101237d1ee271f1803086dbf978645dc23043e241eaa0f3d390df5d8a150', '2026-03-03 13:33:55', '2026-02-01 13:33:55');
+(208, 3, '7b5a89ec998cab7712863efaf0baf701e545f890c54f98c922c877fb85c62e30166f101237d1ee271f1803086dbf978645dc23043e241eaa0f3d390df5d8a150', '2026-03-03 13:33:55', '2026-02-01 13:33:55'),
+(209, 3, 'a326b5764db1b7f427f3c8f99655efbceda6259a89c859f41eef687ce0362e07a26c7d12702112db4267fa00af5f39b38ee9a3c67ea4e68fb9b2bf057f5b20e1', '2026-03-04 06:59:49', '2026-02-02 06:59:49'),
+(210, 3, 'f8673b5e151a765f781e65174f4f0eb1d86e37c0d9e56830b0ee93ca17e95ae1afe6e62fb4641f6128139fb1a3922f2400b9a13518c9940578cfd358f7f0cb48', '2026-03-04 07:16:04', '2026-02-02 07:16:04'),
+(211, 3, '2eb0acad503818f0f1eddd92f0cb26679ecdfcf86ca959c0a93f4ced220a4a489da244eec7759a30024c174c281c71ce5339595624a9947cb7e9dcbf92775ec3', '2026-03-04 08:07:45', '2026-02-02 08:07:45'),
+(212, 3, '2f23e0c6d6c661348fbf637c58d4937da125ad976eac1ccca3f3c75fe7b79d1e44aeb33df46ab998912099bc6a3bb2bdf5a8f19e0c88a041128deff88aff31ca', '2026-03-04 08:23:12', '2026-02-02 08:23:12'),
+(213, 3, '706bcab98cc131d113e785bacf919f8affe35295fb27fadfab70183199b0527cf2ee6b4d85c18a0eb687e8138b10438e3bbf9be7a089ffd6c098627e7c03bcdd', '2026-03-04 08:41:36', '2026-02-02 08:41:36');
 
 -- --------------------------------------------------------
 
@@ -518,6 +524,13 @@ CREATE TABLE `worker_documents` (
   `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
+--
+-- Dumping data for table `worker_documents`
+--
+
+INSERT INTO `worker_documents` (`id`, `user_id`, `type`, `file_path`, `created_at`) VALUES
+(2, 3, 'ktp', 'uploads/documents/doc_3_1770021829.jpeg', NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -527,17 +540,27 @@ CREATE TABLE `worker_documents` (
 CREATE TABLE `worker_educations` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `level` int(11) NOT NULL,
-  `title` int(11) NOT NULL,
-  `instituted_name` int(11) NOT NULL,
-  `year` int(11) NOT NULL,
-  `created_at` datetime NOT NULL,
+  `level` varchar(20) NOT NULL,
+  `title` varchar(100) NOT NULL,
+  `instituted_name` varchar(255) NOT NULL,
+  `start_date` varchar(7) NOT NULL,
+  `end_date` varchar(7) NOT NULL,
+  `is_current` tinyint(1) NOT NULL,
+  `sort_order` int(11) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL,
-  `updated_at` datetime NOT NULL,
+  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `updated_by` smallint(1) NOT NULL,
-  `deleted_at` datetime NOT NULL,
-  `deleted_by` smallint(1) NOT NULL
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` smallint(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `worker_educations`
+--
+
+INSERT INTO `worker_educations` (`id`, `user_id`, `level`, `title`, `instituted_name`, `start_date`, `end_date`, `is_current`, `sort_order`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
+(6, 3, 'S1', 'Sarjana Informatika', 'Universitas Nusa Mandiri', '2026-01', '2026-12', 0, 0, '2026-02-02 15:29:28', 3, NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -732,6 +755,12 @@ ALTER TABLE `worker_documents`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `worker_educations`
+--
+ALTER TABLE `worker_educations`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `worker_experiences`
 --
 ALTER TABLE `worker_experiences`
@@ -791,7 +820,7 @@ ALTER TABLE `job_applications`
 -- AUTO_INCREMENT for table `job_attendances`
 --
 ALTER TABLE `job_attendances`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -803,7 +832,7 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=209;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=214;
 
 --
 -- AUTO_INCREMENT for table `skills`
@@ -821,7 +850,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `worker_documents`
 --
 ALTER TABLE `worker_documents`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `worker_educations`
+--
+ALTER TABLE `worker_educations`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `worker_experiences`

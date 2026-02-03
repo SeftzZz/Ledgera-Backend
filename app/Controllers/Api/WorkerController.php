@@ -12,6 +12,7 @@ use App\Models\WorkerDocumentModel;
 use App\Models\JobModel;
 use App\Models\JobApplicationModel;
 use App\Models\JobAttendanceModel;
+use App\Models\EducationModel;
 
 class WorkerController extends BaseController
 {
@@ -23,6 +24,7 @@ class WorkerController extends BaseController
     protected $job;
     protected $apply;
     protected $attendance;
+    protected $education;
 
     public function __construct()
     {
@@ -33,7 +35,8 @@ class WorkerController extends BaseController
         $this->experience  = new WorkerExperienceModel();
         $this->job         = new JobModel();
         $this->apply       = new JobApplicationModel();
-        $this->attendance = new JobAttendanceModel();
+        $this->attendance  = new JobAttendanceModel();
+        $this->education   = new EducationModel();
     }
 
     /**
@@ -219,11 +222,46 @@ class WorkerController extends BaseController
         $user = $this->request->user;
         $data = $this->request->getJSON(true);
 
-        $data['user_id'] = $user->id;
-        $this->experience->insert($data);
+        // =========================
+        // VALIDASI MINIMAL
+        // =========================
+        if (empty($data['company_name'])) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'message' => 'Company name is required'
+            ]);
+        }
+
+        if (empty($data['start_date'])) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'message' => 'Start date is required'
+            ]);
+        }
+
+        // =========================
+        // NORMALISASI DATA
+        // =========================
+        $data['user_id']    = $user->id;
+        $data['created_by'] = $user->id;
+        $data['is_current'] = !empty($data['is_current']) ? 1 : 0;
+
+        if ($data['is_current'] == 1) {
+            $data['end_date'] = null;
+        }
+
+        // =========================
+        // INSERT
+        // =========================
+        $id = $this->experience->insert($data);
+
+        if (!$id) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'message' => 'Failed to add experience'
+            ]);
+        }
 
         return $this->response->setJSON([
-            'message' => 'Experience added'
+            'message' => 'Experience added',
+            'id'      => $id
         ]);
     }
 
@@ -236,11 +274,137 @@ class WorkerController extends BaseController
     {
         $user = $this->request->user;
 
+        // 1️⃣ CARI EXPERIENCE YANG SEDANG AKTIF
+        $current = $this->experience
+            ->where('user_id', $user->id)
+            ->where('deleted_at', null)
+            ->where('is_current', 1)
+            ->orderBy('start_date', 'DESC')
+            ->first();
+
+        if ($current) {
+            return $this->response->setJSON([$current]);
+        }
+
+        // 2️⃣ JIKA TIDAK ADA, AMBIL end_date TERDEKAT
+        $ended = $this->experience
+            ->where('user_id', $user->id)
+            ->where('deleted_at', null)
+            ->where('end_date IS NOT NULL', null, false)
+            ->orderBy('end_date', 'DESC')
+            ->first();
+
+        if ($ended) {
+            return $this->response->setJSON([$ended]);
+        }
+
+        // 3️⃣ FALLBACK: start_date TERDEKAT
+        $fallback = $this->experience
+            ->where('user_id', $user->id)
+            ->where('deleted_at', null)
+            ->orderBy('start_date', 'DESC')
+            ->first();
+
         return $this->response->setJSON(
-            $this->experience
-                ->where('user_id', $user->id)
-                ->orderBy('start_date', 'DESC')
-                ->findAll()
+            $fallback ? [$fallback] : []
+        );
+    }
+
+    /**
+     * ============================
+     * ADD EDUCATION
+     * ============================
+     */
+    public function addEducation()
+    {
+        $user = $this->request->user;
+        $data = $this->request->getJSON(true);
+
+        // =========================
+        // VALIDASI MINIMAL
+        // =========================
+        if (empty($data['instituted_name'])) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'message' => 'Instituted name is required'
+            ]);
+        }
+
+        if (empty($data['start_date'])) {
+            return $this->response->setStatusCode(422)->setJSON([
+                'message' => 'Start date is required'
+            ]);
+        }
+
+        // =========================
+        // NORMALISASI DATA
+        // =========================
+        $data['user_id']    = $user->id;
+        $data['created_by'] = $user->id;
+        $data['is_current'] = !empty($data['is_current']) ? 1 : 0;
+
+        if ($data['is_current'] == 1) {
+            $data['end_date'] = null;
+        }
+
+        // =========================
+        // INSERT
+        // =========================
+        $id = $this->education->insert($data);
+
+        if (!$id) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'message' => 'Failed to add education'
+            ]);
+        }
+
+        return $this->response->setJSON([
+            'message' => 'education added',
+            'id'      => $id
+        ]);
+    }
+
+    /**
+     * ============================
+     * LIST EDUCATION
+     * ============================
+     */
+    public function educations()
+    {
+        $user = $this->request->user;
+
+        // 1️⃣ PRIORITAS: pendidikan yang sedang berjalan
+        $current = $this->education
+            ->where('user_id', $user->id)
+            ->where('deleted_at', null)
+            ->where('is_current', 1)
+            ->orderBy('start_date', 'DESC')
+            ->first();
+
+        if ($current) {
+            return $this->response->setJSON([$current]);
+        }
+
+        // 2️⃣ JIKA TIDAK ADA, AMBIL end_date TERDEKAT
+        $ended = $this->education
+            ->where('user_id', $user->id)
+            ->where('deleted_at', null)
+            ->where('end_date IS NOT NULL', null, false)
+            ->orderBy('end_date', 'DESC')
+            ->first();
+
+        if ($ended) {
+            return $this->response->setJSON([$ended]);
+        }
+
+        // 3️⃣ FALLBACK: start_date TERDEKAT
+        $fallback = $this->education
+            ->where('user_id', $user->id)
+            ->where('deleted_at', null)
+            ->orderBy('start_date', 'DESC')
+            ->first();
+
+        return $this->response->setJSON(
+            $fallback ? [$fallback] : []
         );
     }
 
@@ -300,7 +464,7 @@ class WorkerController extends BaseController
                 ->setJSON(['message' => 'Invalid file']);
         }
 
-        $allowed = ['image/jpeg','image/png','application/pdf'];
+        $allowed = ['image/jpeg', 'image/png', 'application/pdf'];
         if (!in_array($file->getMimeType(), $allowed)) {
             return $this->response
                 ->setStatusCode(400)
@@ -313,18 +477,30 @@ class WorkerController extends BaseController
                 ->setJSON(['message' => 'Max file size 5MB']);
         }
 
+        // =========================
+        // PATH SESUAI uploadPhoto
+        // =========================
+        $uploadPath = FCPATH . 'uploads/documents';
+
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0755, true);
+        }
+
         $newName = 'doc_' . $user->id . '_' . time() . '.' . $file->getExtension();
-        $file->move('public/uploads/documents', $newName);
+        $file->move($uploadPath, $newName);
+
+        $publicPath = 'uploads/documents/' . $newName;
 
         $docModel = new WorkerDocumentModel();
         $docModel->insert([
             'user_id'   => $user->id,
             'type'      => $type ?? 'other',
-            'file_path' => 'uploads/documents/' . $newName
+            'file_path' => $publicPath
         ]);
 
         return $this->response->setJSON([
-            'message' => 'Document uploaded'
+            'message'   => 'Document uploaded',
+            'file_path' => $publicPath
         ]);
     }
 

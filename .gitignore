@@ -7,3 +7,4 @@ vendor/
 writable/
 .env
 template.txt
+backup/

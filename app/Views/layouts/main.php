@@ -35,6 +35,7 @@
         <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/node-waves/node-waves.css') ?>" />
         <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') ?>" />
         <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/typeahead-js/typeahead.css') ?>" />
+        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/sweetalert2/sweetalert2.css') ?>" />
        
         <!-- Helpers -->
         <script src="<?= base_url('assets/vendor/js/helpers.js') ?>"></script>
@@ -81,7 +82,6 @@
         <!-- / Layout wrapper -->
 
         <!-- Core JS -->
-        <!-- build:js assets/vendor/js/core.js -->
         <script src="<?= base_url('assets/vendor/libs/jquery/jquery.js') ?>"></script>
         <script src="<?= base_url('assets/vendor/libs/popper/popper.js') ?>"></script>
         <script src="<?= base_url('assets/vendor/js/bootstrap.js') ?>"></script>
@@ -95,6 +95,8 @@
 
         <!-- Vendors JS -->
         <?= $this->renderSection('scripts') ?>
+        <script src="<?= base_url('assets/vendor/libs/sweetalert2/sweetalert2new.js') ?>"></script>
+
         
         <!-- Main JS -->
         <script src="<?= base_url('assets/js/main.js') ?>"></script>

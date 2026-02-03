@@ -32,14 +32,12 @@
 		                <script src="<?= base_url('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') ?>"></script>
 
 		                <script>
-						    /**
-						     * DataTables Hotels
-						     */
+						    // DataTables Hotels
 						    'use strict';
 						    $(function () {
-						        let dt_basic_table = $('.dtHotel'), dt_basic;
-						        if (dt_basic_table.length) {
-						        	dt_basic = dt_basic_table.DataTable({
+						        let dt_tableHotel = $('.dtHotel'), dt_hotel;
+						        if (dt_tableHotel.length) {
+						        	dt_hotel = dt_tableHotel.DataTable({
 						        		processing: true,
 					                	serverSide: true,
 					                	responsive: true,
@@ -206,7 +204,50 @@
 									$('div.head-label').html('<h5 class="card-title mb-0">Hotels List</h5>');
 						        }
 						    });
+
+							// Soft Delete
+							$(document).on('click', '.btn-delete', function () {
+							    const id = $(this).data('id');
+
+							    Swal.fire({
+							        title: 'Are you sure!!!',
+							        text: 'Data will be deleted',
+							        icon: 'warning',
+							        showCancelButton: true,
+							        confirmButtonText: 'Yes, delete it!',
+							        cancelButtonText: 'Cancel',
+							        reverseButtons: true
+							    }).then((result) => {
+							        if (result.isConfirmed) {
+							            $.ajax({
+							                url: "<?= base_url('admin/hotels/delete') ?>",
+							                type: "POST",
+							                dataType: "json",
+							                data: {
+							                    id: id,
+							                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+							                },
+							                success: function (res) {
+							                    if (res.status) {
+							                        Swal.fire({
+							                            icon: 'success',
+							                            title: 'Berhasil',
+							                            text: res.message,
+							                            timer: 1500,
+							                            showConfirmButton: false
+							                        });
+
+							                        $('.dtHotel').DataTable().ajax.reload(null, false);
+							                    } else {
+							                        Swal.fire('Gagal', res.message, 'error');
+							                    }
+							                },
+							                error: function () {
+							                    Swal.fire('Error', 'Terjadi kesalahan server', 'error');
+							                }
+							            });
+							        }
+							    });
+							});
 						</script>
-
-
                         <?= $this->endSection() ?>

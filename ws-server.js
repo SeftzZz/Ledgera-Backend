@@ -5,11 +5,11 @@ const app = express();
 app.use(express.json());
 
 const wss = new WebSocket.Server({
-  port: 3002,
+  port: 3004,
   host: '0.0.0.0'
 });
 
-console.log('WebSocket server running on port 3002');
+console.log('WebSocket server running on port 3004');
 
 /**
  * =========================
@@ -56,8 +56,8 @@ app.post('/emit', (req, res) => {
 });
 
 /**
- * HTTP server (PORT 3003)
+ * HTTP server (PORT 30035)
  */
-app.listen(3003, () => {
-  console.log('WS HTTP bridge running on port 3003');
+app.listen(3005, () => {
+  console.log('WS HTTP bridge running on port 3005');
 });

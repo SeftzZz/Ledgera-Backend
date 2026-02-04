@@ -24,9 +24,11 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
 
     $routes->get('hotels', 'Admin\Hotels::index', ['filter' => 'role:admin']);
     $routes->post('hotels/datatable', 'Admin\Hotels::datatable', ['filter' => 'role:admin']);
-    $routes->post('hotels/store', 'Admin\Hotels::store');
-    $routes->post('hotels/update', 'Admin\Hotels::update');
-    $routes->post('hotels/delete', 'Admin\Hotels::delete');
+    $routes->post('hotels/store', 'Admin\Hotels::store', ['filter' => 'role:admin']);
+    $routes->post('hotels/get', 'Admin\Hotels::getById', ['filter' => 'role:admin']);
+    $routes->post('hotels/update', 'Admin\Hotels::update', ['filter' => 'role:admin']);
+    $routes->post('hotels/delete', 'Admin\Hotels::delete', ['filter' => 'role:admin']);
+    
 });
 
 $routes->group('api', function($routes) {

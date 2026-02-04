@@ -10,7 +10,7 @@ class HotelModel extends Model
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
-        'hotel_name','location','latitude','longitude','website','founded','size','logo','created_at','created_by',
+        'hotel_name','location','latitude','longitude','website','description','founded','size','logo','created_at','created_by',
         'updated_at','updated_by','deleted_at','deleted_by'
     ];
 

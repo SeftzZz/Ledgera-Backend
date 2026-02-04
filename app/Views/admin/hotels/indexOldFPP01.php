@@ -3,23 +3,90 @@
                             <div class="container-xxl flex-grow-1 container-p-y">
                                 <div class="card">
                                     <div class="card-datatable table-responsive pt-0">
-						                <table class="datatables-basic table">
+						                <table class="dtHotel table">
 						                    <thead>
 						                      	<tr>
 							                        <th></th>
-							                        <th></th>
-							                        <th>id</th>
-							                        <th>Name</th>
-							                        <th>Email</th>
-							                        <th>Date</th>
-							                        <th>Salary</th>
-							                        <th>Status</th>
+							                        <th>No.</th>
+							                        <th>Hotel Name</th>
+							                        <th>Address</th>
+							                        <th>Latitude</th>
+							                        <th>Longitude</th>
+							                        <th>Website</th>
 							                        <th>Action</th>
 						                      	</tr>
 						                    </thead>
 						                    <tbody></tbody>
 						                </table>
 					                </div>
+
+					                <div class="modal fade" id="modalEditHotel" tabindex="-1" aria-hidden="true">
+										<div class="modal-dialog modal-lg modal-dialog-centered">
+										    <div class="modal-content">
+											    <form id="formEditHotel" enctype="multipart/form-data">
+											        <div class="modal-header">
+											          	<h5 class="modal-title">Edit Hotel</h5>
+											          	<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+											        </div>
+
+											        <div class="modal-body">
+											          	<input type="hidden" name="id" id="edit_id">
+
+											          	<div class="mb-3">
+											            	<label class="form-label" for="edit_hotel_name">Hotel Name</label>
+											            	<input type="text" class="form-control" name="hotel_name" id="edit_hotel_name" required>
+											          	</div>
+
+											          	<div class="mb-3">
+											            	<label class="form-label" for="edit_location">Address</label>
+											            	<input type="text" class="form-control" name="location" id="edit_location" required>
+											          	</div>
+
+											        	<div class="mb-3 position-relative">
+														    <label class="form-label" for="searchLocation">Search Location</label>
+														    <input type="text" id="searchLocation" class="form-control" placeholder="Type the place or address..." autocomplete="off"
+														    >
+														    <div id="searchResult" class="list-group position-absolute w-100" style="z-index: 1055;"></div>
+														</div>
+
+											        	<div class="mb-3">
+														    <label class="form-label">Select on Map</label>
+														    <div id="mapEditHotel" style="height: 350px; border-radius: 8px;"></div>
+														</div>
+
+											        	<div class="mb-3">
+											            	<label class="form-label" for="edit_website">Website</label>
+											            	<input type="text" class="form-control" name="website" id="edit_website">
+											          	</div>
+
+											          	<div class="mb-3">
+									                        <label class="form-label" for="edit_desc">Description</label>
+									                        <textarea class="form-control" name="desc" id="edit_desc" rows="3"></textarea>
+									                    </div>
+
+									                    <div class="mb-3">
+														    <label class="form-label" for="edit_logo">Logo</label>
+														    <div class="mb-2">
+														        <img id="preview_logo" src="" class="img-thumbnail" style="max-height:120px">
+														    </div>
+														    <input type="file" class="form-control" name="logo" id="edit_logo" accept="image/*">
+														    <small class="text-muted">
+														        Leave blank if you don't want to change
+														    </small>
+														</div>
+											        </div>
+
+											        <div class="modal-footer">
+											        	<input type="hidden" class="form-control" name="latitude" id="edit_latitude">
+											        	<input type="hidden" class="form-control" name="longitude" id="edit_longitude">
+
+											          	<button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Cancel</button>
+											          	<button type="submit" class="btn btn-primary">Save</button>
+											        </div>
+											    </form>
+										    </div>
+										</div>
+									</div>
                                 </div>
                             </div>
                         <?= $this->endSection() ?>
@@ -31,387 +98,466 @@
 				        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css') ?>" />
 				        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css') ?>" />
 		                <script src="<?= base_url('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') ?>"></script>
+		                <!-- Leaflet + OpenStreetMap -->
+		                <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+						<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 		                <script>
-		                	/**
-							 * DataTables Basic
-							 */
+						    // DataTables Hotels
+						    'use strict';
+						    $(function () {
+						        let dt_tableHotel = $('.dtHotel'), dt_hotel;
+						        if (dt_tableHotel.length) {
+						        	dt_hotel = dt_tableHotel.DataTable({
+						        		processing: true,
+					                	serverSide: true,
+					                	responsive: true,
+						                ajax: {
+						                    url: "<?= base_url('admin/hotels/datatable') ?>",
+						                    type: "POST",
+						                    data: d => {
+						                        d['<?= csrf_token() ?>'] = '<?= csrf_hash() ?>';
+						                    }
+						                },
+						                columns: [
+						                    { data: null },          // responsive control
+						                    { data: 'no_urut' },
+						                    { data: 'hotel_name' },
+						                    { data: 'location' },
+						                    { data: 'latitude' },
+						                    { data: 'longitude' },
+						                    { data: 'website' },
+						                    { data: 'action' }       // actions (HTML from backend)
+						                ],
+						                columnDefs: [
+						                    {
+						                        // Responsive control
+						                        className: 'control',
+						                        orderable: false,
+						                        searchable: false,
+						                        responsivePriority: 2,
+						                        targets: 0,
+						                        render: function () {
+						                            return '';
+						                        }
+						                    },
+						                    {
+									          	targets: 1,
+									          	orderable: false,
+									          	searchable: false
+									        },
+					                    	{
+					                    		// Hotel name
+								          		targets: 2,
+								          		responsivePriority: 1,
+								          		render: function (data, type, full) {
+									            	var $user_img = full['logo'],
+									              	$name = full['hotel_name'];
+									            	if ($user_img) {
+									              		// For Avatar image
+									             		var $output = '<img src="' + "../" + $user_img + '" class="rounded-circle">';
+									            	} else {
+									              		// For Avatar badge
+									              		var stateNum = Math.floor(Math.random() * 6);
+									              		var states = ['success', 'danger', 'warning', 'info', 'primary', 'secondary'];
+									              		var $state = states[stateNum],
+									                	$name = full['hotel_name'],
+									                	$initials = $name.match(/\b\w/g) || [];
+									              		$initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
+									              		$output = '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
+									            	}
+									            	
+									            	// Creates full output for row
+									            	var $row_output =
+									              		'<div class="d-flex justify-content-start align-items-center user-name">' +
+									              		'<div class="avatar-wrapper">' +
+									              		'<div class="avatar me-2">' +
+									              		$output +
+									              		'</div>' +
+									              		'</div>' +
+									              		'<div class="d-flex flex-column">' +
+									              		'<span class="emp_name text-truncate">' +
+									              		$name +
+									              		'</span>' +
+									              		'</div>' +
+									              		'</div>';
+									            	return $row_output;
+									          	}
+								        	},
+						                    {
+						                        // Actions
+						                        targets: -1,
+						                        title: 'Actions',
+						                        orderable: false,
+						                        searchable: false
+						                    }
+					                	],
+					                	order: [[2, 'asc']],
+					                	dom:
+					                    	'<"card-header flex-column flex-md-row"' +
+					                        '<"head-label text-center">' +
+					                        '<"dt-action-buttons text-end pt-3 pt-md-0"B>' +
+					                    	'>' +
+					                    	'<"row"' +
+					                        '<"col-sm-12 col-md-6"l>' +
+					                        '<"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>' +
+					                    	'>' +
+					                    	't' +
+					                    	'<"row"' +
+					                        '<"col-sm-12 col-md-6"i>' +
+					                        '<"col-sm-12 col-md-6"p>' +
+					                    	'>',
+					                    displayLength: 10,
+						                lengthMenu: [10, 25, 50, 100],
+						                buttons: [
+						                    {
+						                        extend: 'collection',
+						                        className: 'btn btn-label-primary dropdown-toggle me-2 waves-effect waves-light',
+						                        text: '<i class="ti ti-file-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
+						                        buttons: [
+						                            {
+						                                extend: 'print',
+						                                text: '<i class="ti ti-printer me-1"></i>Print',
+						                                className: 'dropdown-item',
+						                                exportOptions: { columns: [1,2,3,4,5,6] }
+						                            },
+						                            {
+						                                extend: 'csv',
+						                                text: '<i class="ti ti-file-text me-1"></i>Csv',
+						                                className: 'dropdown-item',
+						                                exportOptions: { columns: [1,2,3,4,5,6] }
+						                            },
+						                            {
+						                                extend: 'excel',
+						                                text: '<i class="ti ti-file-spreadsheet me-1"></i>Excel',
+						                                className: 'dropdown-item',
+						                                exportOptions: { columns: [1,2,3,4,5,6] }
+						                            },
+						                            {
+						                                extend: 'pdf',
+						                                text: '<i class="ti ti-file-description me-1"></i>Pdf',
+						                                className: 'dropdown-item',
+						                                exportOptions: { columns: [1,2,3,4,5,6] }
+						                            }
+						                        ]
+						                    },
+						                    {
+						                        text: '<i class="ti ti-plus me-sm-1"></i> <span class="d-sm-inline-block">Add New Hotel</span>',
+						                        className: 'create-new btn btn-primary waves-effect waves-light'
+						                    }
+						                ],
+						                responsive: {
+						                    details: {
+						                        display: $.fn.dataTable.Responsive.display.modal({
+						                            header: function (row) {
+						                                let data = row.data();
+						                                return 'Details of ' + data.hotel_name;
+						                            }
+						                        }),
+						                        type: 'column',
+						                        renderer: function (api, rowIdx, columns) {
+						                            let data = $.map(columns, function (col) {
+						                                return col.title !== ''
+						                                    ? '<tr>' +
+						                                          '<td>' + col.title + ':</td>' +
+						                                          '<td>' + col.data + '</td>' +
+						                                      '</tr>'
+						                                    : '';
+						                            }).join('');
 
-							'use strict';
+						                            return data
+						                                ? $('<table class="table"><tbody /></table>').append(data)
+						                                : false;
+						                        }
+						                    }
+						                }
+						        	});
+									$('div.head-label').html('<h5 class="card-title mb-0">Hotels List</h5>');
+						        }
+						    });
 
-							let fv;
-
-							// datatable (jquery)
-							$(function () {
-							  var dt_basic_table = $('.datatables-basic'),
-							    dt_basic;
-
-							  // DataTable with buttons
-							  // --------------------------------------------------------------------
-
-							  if (dt_basic_table.length) {
-							    dt_basic = dt_basic_table.DataTable({
-							      ajax: assetsPath + 'json/table-datatable.json',
-							      columns: [
-							        { data: '' },
-							        { data: 'id' },
-							        { data: 'id' },
-							        { data: 'full_name' },
-							        { data: 'email' },
-							        { data: 'start_date' },
-							        { data: 'salary' },
-							        { data: 'status' },
-							        { data: '' }
-							      ],
-							      columnDefs: [
-							        {
-							          // For Responsive
-							          className: 'control',
-							          orderable: false,
-							          searchable: false,
-							          responsivePriority: 2,
-							          targets: 0,
-							          render: function (data, type, full, meta) {
-							            return '';
-							          }
-							        },
-							        {
-							          // For Checkboxes
-							          targets: 1,
-							          orderable: false,
-							          searchable: false,
-							          responsivePriority: 3,
-							          checkboxes: true,
-							          render: function () {
-							            return '<input type="checkbox" class="dt-checkboxes form-check-input">';
-							          },
-							          checkboxes: {
-							            selectAllRender: '<input type="checkbox" class="form-check-input">'
-							          }
-							        },
-							        {
-							          targets: 2,
-							          searchable: false,
-							          visible: false
-							        },
-							        {
-							          // Avatar image/badge, Name and post
-							          targets: 3,
-							          responsivePriority: 4,
-							          render: function (data, type, full, meta) {
-							            var $user_img = full['avatar'],
-							              $name = full['full_name'],
-							              $post = full['post'];
-							            if ($user_img) {
-							              // For Avatar image
-							              var $output =
-							                '<img src="' + assetsPath + 'img/avatars/' + $user_img + '" alt="Avatar" class="rounded-circle">';
-							            } else {
-							              // For Avatar badge
-							              var stateNum = Math.floor(Math.random() * 6);
-							              var states = ['success', 'danger', 'warning', 'info', 'primary', 'secondary'];
-							              var $state = states[stateNum],
-							                $name = full['full_name'],
-							                $initials = $name.match(/\b\w/g) || [];
-							              $initials = (($initials.shift() || '') + ($initials.pop() || '')).toUpperCase();
-							              $output = '<span class="avatar-initial rounded-circle bg-label-' + $state + '">' + $initials + '</span>';
-							            }
-							            // Creates full output for row
-							            var $row_output =
-							              '<div class="d-flex justify-content-start align-items-center user-name">' +
-							              '<div class="avatar-wrapper">' +
-							              '<div class="avatar me-2">' +
-							              $output +
-							              '</div>' +
-							              '</div>' +
-							              '<div class="d-flex flex-column">' +
-							              '<span class="emp_name text-truncate">' +
-							              $name +
-							              '</span>' +
-							              '<small class="emp_post text-truncate text-muted">' +
-							              $post +
-							              '</small>' +
-							              '</div>' +
-							              '</div>';
-							            return $row_output;
-							          }
-							        },
-							        {
-							          responsivePriority: 1,
-							          targets: 4
-							        },
-							        {
-							          // Label
-							          targets: -2,
-							          render: function (data, type, full, meta) {
-							            var $status_number = full['status'];
-							            var $status = {
-							              1: { title: 'Current', class: 'bg-label-primary' },
-							              2: { title: 'Professional', class: ' bg-label-success' },
-							              3: { title: 'Rejected', class: ' bg-label-danger' },
-							              4: { title: 'Resigned', class: ' bg-label-warning' },
-							              5: { title: 'Applied', class: ' bg-label-info' }
-							            };
-							            if (typeof $status[$status_number] === 'undefined') {
-							              return data;
-							            }
-							            return (
-							              '<span class="badge ' + $status[$status_number].class + '">' + $status[$status_number].title + '</span>'
-							            );
-							          }
-							        },
-							        {
-							          // Actions
-							          targets: -1,
-							          title: 'Actions',
-							          orderable: false,
-							          searchable: false,
-							          render: function (data, type, full, meta) {
-							            return (
-							              '<div class="d-inline-block">' +
-							              '<a href="javascript:;" class="btn btn-sm btn-icon dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i class="text-primary ti ti-dots-vertical"></i></a>' +
-							              '<ul class="dropdown-menu dropdown-menu-end m-0">' +
-							              '<li><a href="javascript:;" class="dropdown-item">Details</a></li>' +
-							              '<li><a href="javascript:;" class="dropdown-item">Archive</a></li>' +
-							              '<div class="dropdown-divider"></div>' +
-							              '<li><a href="javascript:;" class="dropdown-item text-danger delete-record">Delete</a></li>' +
-							              '</ul>' +
-							              '</div>' +
-							              '<a href="javascript:;" class="btn btn-sm btn-icon item-edit"><i class="text-primary ti ti-pencil"></i></a>'
-							            );
-							          }
-							        }
-							      ],
-							      order: [[2, 'desc']],
-							      dom: '<"card-header flex-column flex-md-row"<"head-label text-center"><"dt-action-buttons text-end pt-3 pt-md-0"B>><"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6 d-flex justify-content-center justify-content-md-end"f>>t<"row"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-							      displayLength: 7,
-							      lengthMenu: [7, 10, 25, 50, 75, 100],
-							      buttons: [
-							        {
-							          extend: 'collection',
-							          className: 'btn btn-label-primary dropdown-toggle me-2 waves-effect waves-light',
-							          text: '<i class="ti ti-file-export me-sm-1"></i> <span class="d-none d-sm-inline-block">Export</span>',
-							          buttons: [
-							            {
-							              extend: 'print',
-							              text: '<i class="ti ti-printer me-1" ></i>Print',
-							              className: 'dropdown-item',
-							              exportOptions: {
-							                columns: [3, 4, 5, 6, 7],
-							                // prevent avatar to be display
-							                format: {
-							                  body: function (inner, coldex, rowdex) {
-							                    if (inner.length <= 0) return inner;
-							                    var el = $.parseHTML(inner);
-							                    var result = '';
-							                    $.each(el, function (index, item) {
-							                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-							                        result = result + item.lastChild.firstChild.textContent;
-							                      } else if (item.innerText === undefined) {
-							                        result = result + item.textContent;
-							                      } else result = result + item.innerText;
-							                    });
-							                    return result;
-							                  }
-							                }
-							              },
-							              customize: function (win) {
-							                //customize print view for dark
-							                $(win.document.body)
-							                  .css('color', config.colors.headingColor)
-							                  .css('border-color', config.colors.borderColor)
-							                  .css('background-color', config.colors.bodyBg);
-							                $(win.document.body)
-							                  .find('table')
-							                  .addClass('compact')
-							                  .css('color', 'inherit')
-							                  .css('border-color', 'inherit')
-							                  .css('background-color', 'inherit');
-							              }
-							            },
-							            {
-							              extend: 'csv',
-							              text: '<i class="ti ti-file-text me-1" ></i>Csv',
-							              className: 'dropdown-item',
-							              exportOptions: {
-							                columns: [3, 4, 5, 6, 7],
-							                // prevent avatar to be display
-							                format: {
-							                  body: function (inner, coldex, rowdex) {
-							                    if (inner.length <= 0) return inner;
-							                    var el = $.parseHTML(inner);
-							                    var result = '';
-							                    $.each(el, function (index, item) {
-							                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-							                        result = result + item.lastChild.firstChild.textContent;
-							                      } else if (item.innerText === undefined) {
-							                        result = result + item.textContent;
-							                      } else result = result + item.innerText;
-							                    });
-							                    return result;
-							                  }
-							                }
-							              }
-							            },
-							            {
-							              extend: 'excel',
-							              text: '<i class="ti ti-file-spreadsheet me-1"></i>Excel',
-							              className: 'dropdown-item',
-							              exportOptions: {
-							                columns: [3, 4, 5, 6, 7],
-							                // prevent avatar to be display
-							                format: {
-							                  body: function (inner, coldex, rowdex) {
-							                    if (inner.length <= 0) return inner;
-							                    var el = $.parseHTML(inner);
-							                    var result = '';
-							                    $.each(el, function (index, item) {
-							                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-							                        result = result + item.lastChild.firstChild.textContent;
-							                      } else if (item.innerText === undefined) {
-							                        result = result + item.textContent;
-							                      } else result = result + item.innerText;
-							                    });
-							                    return result;
-							                  }
-							                }
-							              }
-							            },
-							            {
-							              extend: 'pdf',
-							              text: '<i class="ti ti-file-description me-1"></i>Pdf',
-							              className: 'dropdown-item',
-							              exportOptions: {
-							                columns: [3, 4, 5, 6, 7],
-							                // prevent avatar to be display
-							                format: {
-							                  body: function (inner, coldex, rowdex) {
-							                    if (inner.length <= 0) return inner;
-							                    var el = $.parseHTML(inner);
-							                    var result = '';
-							                    $.each(el, function (index, item) {
-							                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-							                        result = result + item.lastChild.firstChild.textContent;
-							                      } else if (item.innerText === undefined) {
-							                        result = result + item.textContent;
-							                      } else result = result + item.innerText;
-							                    });
-							                    return result;
-							                  }
-							                }
-							              }
-							            },
-							            {
-							              extend: 'copy',
-							              text: '<i class="ti ti-copy me-1" ></i>Copy',
-							              className: 'dropdown-item',
-							              exportOptions: {
-							                columns: [3, 4, 5, 6, 7],
-							                // prevent avatar to be display
-							                format: {
-							                  body: function (inner, coldex, rowdex) {
-							                    if (inner.length <= 0) return inner;
-							                    var el = $.parseHTML(inner);
-							                    var result = '';
-							                    $.each(el, function (index, item) {
-							                      if (item.classList !== undefined && item.classList.contains('user-name')) {
-							                        result = result + item.lastChild.firstChild.textContent;
-							                      } else if (item.innerText === undefined) {
-							                        result = result + item.textContent;
-							                      } else result = result + item.innerText;
-							                    });
-							                    return result;
-							                  }
-							                }
-							              }
-							            }
-							          ]
-							        },
-							        {
-							          text: '<i class="ti ti-plus me-sm-1"></i> <span class="d-none d-sm-inline-block">Add New Record</span>',
-							          className: 'create-new btn btn-primary waves-effect waves-light'
-							        }
-							      ],
-							      responsive: {
-							        details: {
-							          display: $.fn.dataTable.Responsive.display.modal({
-							            header: function (row) {
-							              var data = row.data();
-							              return 'Details of ' + data['full_name'];
-							            }
-							          }),
-							          type: 'column',
-							          renderer: function (api, rowIdx, columns) {
-							            var data = $.map(columns, function (col, i) {
-							              return col.title !== '' // ? Do not show row in modal popup if title is blank (for check box)
-							                ? '<tr data-dt-row="' +
-							                    col.rowIndex +
-							                    '" data-dt-column="' +
-							                    col.columnIndex +
-							                    '">' +
-							                    '<td>' +
-							                    col.title +
-							                    ':' +
-							                    '</td> ' +
-							                    '<td>' +
-							                    col.data +
-							                    '</td>' +
-							                    '</tr>'
-							                : '';
-							            }).join('');
-
-							            return data ? $('<table class="table"/><tbody />').append(data) : false;
-							          }
-							        }
-							      }
-							    });
-							    $('div.head-label').html('<h5 class="card-title mb-0">DataTable with Buttons</h5>');
-							  }
-
-							  // Add New record
-							  // ? Remove/Update this code as per your requirements
-							  var count = 101;
-							  // On form submit, if form is valid
-							  fv.on('core.form.valid', function () {
-							    var $new_name = $('.add-new-record .dt-full-name').val(),
-							      $new_post = $('.add-new-record .dt-post').val(),
-							      $new_email = $('.add-new-record .dt-email').val(),
-							      $new_date = $('.add-new-record .dt-date').val(),
-							      $new_salary = $('.add-new-record .dt-salary').val();
-
-							    if ($new_name != '') {
-							      dt_basic.row
-							        .add({
-							          id: count,
-							          full_name: $new_name,
-							          post: $new_post,
-							          email: $new_email,
-							          start_date: $new_date,
-							          salary: '$' + $new_salary,
-							          status: 5
-							        })
-							        .draw();
-							      count++;
-
-							      // Hide offcanvas using javascript method
-							      offCanvasEl.hide();
+							// Map
+							let mapEdit, markerEdit;
+							function initEditMap(lat, lng) {
+							    // destroy map lama (penting saat modal dibuka ulang)
+							    if (mapEdit) {
+							        mapEdit.remove();
 							    }
-							  });
 
-							  // Delete Record
-							  $('.datatables-basic tbody').on('click', '.delete-record', function () {
-							    dt_basic.row($(this).parents('tr')).remove().draw();
-							  });
+							    mapEdit = L.map('mapEditHotel').setView([lat, lng], 15);
 
-							  
-							  // Filter form control to default size
-							  // ? setTimeout used for multilingual table initialization
-							  setTimeout(() => {
-							    $('.dataTables_filter .form-control').removeClass('form-control-sm');
-							    $('.dataTables_length .form-select').removeClass('form-select-sm');
-							  }, 300);
+							    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+							        attribution: '&copy; OpenStreetMap'
+							    }).addTo(mapEdit);
+
+							    markerEdit = L.marker([lat, lng], {
+							        draggable: true
+							    }).addTo(mapEdit);
+
+							    // update input saat marker digeser
+							    markerEdit.on('dragend', function (e) {
+							        const pos = e.target.getLatLng();
+							        updateLocationFromMap(pos.lat, pos.lng);
+							    });
+
+							    // update saat map diklik
+							    mapEdit.on('click', function (e) {
+							        markerEdit.setLatLng(e.latlng);
+							        updateLocationFromMap(e.latlng.lat, e.latlng.lng);
+
+							    });
+
+							    // FIX map size saat modal muncul
+							    setTimeout(() => {
+							        mapEdit.invalidateSize();
+							    }, 300);
+							}
+
+							// Cari Map
+							let searchTimeout = null;
+							$('#searchLocation').on('input', function () {
+							    const q = $(this).val();
+
+							    if (q.length < 3) {
+							        $('#searchResult').empty();
+							        return;
+							    }
+
+							    clearTimeout(searchTimeout);
+
+							    searchTimeout = setTimeout(() => {
+							        $.getJSON(
+							            'https://nominatim.openstreetmap.org/search',
+							            {
+							                q: q,
+							                format: 'json',
+							                addressdetails: 1,
+							                limit: 5
+							            },
+							            function (data) {
+							                $('#searchResult').empty();
+
+							                if (!data.length) {
+							                    $('#searchResult').append(
+							                        '<div class="list-group-item disabled">Tidak ditemukan</div>'
+							                    );
+							                    return;
+							                }
+
+							                data.forEach(item => {
+							                    $('#searchResult').append(`
+							                        <button
+							                            type="button"
+							                            class="list-group-item list-group-item-action"
+							                            data-lat="${item.lat}"
+							                            data-lng="${item.lon}"
+							                            data-name="${item.display_name}"
+							                        >
+							                            ${item.display_name}
+							                        </button>
+							                    `);
+							                });
+							            }
+							        );
+							    }, 500);
 							});
 
-		                </script>
+							$(document).on('click', '#searchResult button', function () {
+							    const lat = parseFloat($(this).data('lat'));
+							    const lng = parseFloat($(this).data('lng'));
+							    const name = $(this).data('name');
 
+							    $('#searchLocation').val(name);
+							    $('#searchResult').empty();
+
+							    markerEdit.setLatLng([lat, lng]);
+							    mapEdit.setView([lat, lng], 17);
+
+							    updateLocationFromMap(lat, lng);
+							});
+
+							// ambil kota atau provinsi
+							function updateLocationFromMap(lat, lng) {
+							    // simpan koordinat
+							    $('#edit_latitude').val(lat.toFixed(7));
+							    $('#edit_longitude').val(lng.toFixed(7));
+							    // reverse geocode
+							    $.getJSON(
+							        'https://nominatim.openstreetmap.org/reverse',
+							        {
+							            lat: lat,
+							            lon: lng,
+							            format: 'json',
+							            addressdetails: 1
+							        },
+							        function (res) {
+							            if (!res || !res.address) return;
+
+							            const addr = res.address;
+
+							            const city =
+							                addr.city ||
+							                addr.town ||
+							                addr.municipality ||
+							                addr.city_district ||  
+                							addr.county ||          
+							                addr.village ||
+							                '';
+
+							            const province = addr.state || '';
+
+							            let lokasi = '';
+
+							            if (city && province) {
+							                lokasi = `${city}, ${province}`;
+							            } else if (province) {
+							                lokasi = province;
+							            }
+
+							            $('#edit_location').val(lokasi);
+							        }
+							    );
+							}
+
+
+							// Edit
+							$(document).on('click', '.btn-edit', function () {
+							    const id = $(this).data('id');
+
+							    $('#edit_logo').on('change', function () {
+								    const file = this.files[0];
+								    if (file) {
+								        $('#preview_logo').attr('src', URL.createObjectURL(file));
+								    }
+								});
+
+							    $.post("<?= base_url('admin/hotels/get') ?>", {
+							        id: id,
+							        '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+							    }, function (res) {
+							        if (res.status) {
+							            $('#edit_id').val(res.data.id);
+							            $('#edit_hotel_name').val(res.data.hotel_name);
+							            $('#edit_location').val(res.data.location);
+							            $('#edit_latitude').val(res.data.latitude);
+							            $('#edit_longitude').val(res.data.longitude);
+							            $('#edit_website').val(res.data.website);
+							            $('#edit_desc').val(res.data.description);
+							            if (res.data.logo) {
+										  	$('#preview_logo')
+										    .attr('src', "<?= base_url() ?>" + res.data.logo)
+										    .show();
+										} else {
+										  	$('#preview_logo')
+										    .removeAttr('src')
+										    .hide();
+										}
+										$('#edit_logo').val('');
+
+							            $('#modalEditHotel').modal('show');
+
+							            // INIT MAP
+									    const lat = res.data.latitude ? parseFloat(res.data.latitude) : -6.597147;
+									    const lng = res.data.longitude ? parseFloat(res.data.longitude) : 106.806039;
+
+									    initEditMap(lat, lng);
+
+									    $('#searchLocation').val('');
+										$('#searchResult').empty();
+							        } else {
+							            Swal.fire('Gagal', res.message, 'error');
+							        }
+							    }, 'json');
+							});
+
+							$('#formEditHotel').on('submit', function (e) {
+							    e.preventDefault();
+							    let formData = new FormData(this);
+							    formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
+							    Swal.fire({
+							        title: 'Are you sure?',
+							        icon: 'question',
+							        showCancelButton: true,
+							        showDenyButton: false,
+							        confirmButtonText: 'Yes, update',
+							        cancelButtonText: 'No',
+							        reverseButtons: true
+							    }).then((result) => {
+							        if (result.isConfirmed) {
+							            $.ajax({
+									        url: "<?= base_url('admin/hotels/update') ?>",
+									        type: "POST",
+									        data: formData,
+									        processData: false,
+									        contentType: false,
+									        dataType: 'json',
+									        success: function (res) {
+									            if (res.status) {
+									                Swal.fire({
+									                    icon: 'success',
+									                    title: 'Succeed',
+									                    text: res.message,
+									                    timer: 1500,
+									                    showConfirmButton: false
+									                });
+
+									                $('#modalEditHotel').modal('hide');
+									                $('.dtHotel').DataTable().ajax.reload(null, false);
+									            } else {
+									                Swal.fire('Failed', res.message, 'error');
+									            }
+									        },
+									        error: function () {
+									            Swal.fire('Error', 'Server error', 'error');
+									        }
+									    });
+							        }
+							    });
+							});
+
+							// Delete Soft
+							$(document).on('click', '.btn-delete', function () {
+							    const id = $(this).data('id');
+
+							    Swal.fire({
+							        title: 'Are you sure!!!',
+							        text: 'Data will be deleted',
+							        icon: 'warning',
+							        showCancelButton: true,
+							        confirmButtonText: 'Yes, delete it!',
+							        cancelButtonText: 'Cancel',
+							        reverseButtons: true
+							    }).then((result) => {
+							        if (result.isConfirmed) {
+							            $.ajax({
+							                url: "<?= base_url('admin/hotels/delete') ?>",
+							                type: "POST",
+							                dataType: "json",
+							                data: {
+							                    id: id,
+							                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+							                },
+							                success: function (res) {
+							                    if (res.status) {
+							                        Swal.fire({
+							                            icon: 'success',
+							                            title: 'Berhasil',
+							                            text: res.message,
+							                            timer: 1500,
+							                            showConfirmButton: false
+							                        });
+
+							                        $('.dtHotel').DataTable().ajax.reload(null, false);
+							                    } else {
+							                        Swal.fire('Gagal', res.message, 'error');
+							                    }
+							                },
+							                error: function () {
+							                    Swal.fire('Error', 'Terjadi kesalahan server', 'error');
+							                }
+							            });
+							        }
+							    });
+							});
+						</script>
                         <?= $this->endSection() ?>

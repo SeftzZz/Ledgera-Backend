@@ -129,38 +129,6 @@ class Hotels extends BaseAdminController
         ]);
     }
 
-    public function store()
-    {
-        if (! $this->request->isAJAX()) {
-            return $this->response->setStatusCode(404);
-        }
-
-        $data = [
-            'hotel_name' => $this->request->getPost('hotel_name'),
-            'location'   => $this->request->getPost('location'),
-            'latitude'   => $this->request->getPost('latitude'),
-            'longitude'  => $this->request->getPost('longitude'),
-            'website'    => $this->request->getPost('website'),
-            'description'=> $this->request->getPost('desc'),
-            'created_by' => session()->get('user_id')
-        ];
-
-        $file = $this->request->getFile('logo');
-        if ($file && $file->isValid()) {
-            $name = $file->getRandomName();
-            $file->move(FCPATH . 'images', $name);
-            $data['logo'] = 'images/' . $name;
-        }
-
-        $this->hotelModel->insert($data);
-
-        return $this->response->setJSON([
-            'status' => true,
-            'message' => 'Hotel successfully added'
-        ]);
-    }
-
-
     public function getById()
     {
         if (!$this->request->isAJAX()) {

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 02, 2026 at 05:08 PM
+-- Generation Time: Feb 04, 2026 at 06:18 PM
 -- Server version: 10.11.10-MariaDB-log
 -- PHP Version: 8.3.27
 
@@ -30,20 +30,20 @@ SET time_zone = "+00:00";
 CREATE TABLE `hotels` (
   `id` int(11) NOT NULL,
   `hotel_name` varchar(50) NOT NULL,
-  `location` varchar(255) NOT NULL,
+  `location` varchar(250) NOT NULL,
   `latitude` decimal(10,7) NOT NULL,
   `longitude` decimal(10,7) NOT NULL,
   `website` varchar(50) DEFAULT NULL,
   `description` text NOT NULL,
   `founded` year(4) NOT NULL,
   `size` int(11) DEFAULT NULL,
-  `logo` text NOT NULL,
+  `logo` varchar(250) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `created_by` int(1) NOT NULL,
-  `updated_at` datetime NOT NULL,
-  `updated_by` smallint(1) NOT NULL,
-  `deleted_at` datetime NOT NULL,
-  `deleted_by` smallint(1) NOT NULL
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` int(1) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -51,7 +51,7 @@ CREATE TABLE `hotels` (
 --
 
 INSERT INTO `hotels` (`id`, `hotel_name`, `location`, `latitude`, `longitude`, `website`, `description`, `founded`, `size`, `logo`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
-(1, 'Sahira Butik Hotel Paledang', 'Bogor West Java', -6.6013410, 106.7941890, 'paledang.sahirahotelsgroup.com', 'Sahira Butik Hotel Paledang adalah hotel di lokasi yang baik, tepatnya berada di Juanda. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.', '2005', 100, 'images/sbh-color.png', '2026-01-26 07:28:33', 1, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0);
+(1, 'Sahira Butik Hotel Paledang', 'Bogor, West Java', -6.6011188, 106.7941239, 'paledang.sahirahotelsgroup.com', 'Sahira Butik Hotel Paledang adalah hotel di lokasi yang baik, tepatnya berada di Juanda. Resepsionis siap 24 jam untuk melayani proses check-in, check-out dan kebutuhan Anda yang lain. Jangan ragu untuk menghubungi resepsionis, kami siap melayani Anda. WiFi tersedia di seluruh area publik properti untuk membantu Anda tetap terhubung dengan keluarga dan teman.', '2005', 100, 'images/sbh-color.png', '2026-01-26 07:28:33', 1, '2026-02-04 14:28:11', 3, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -87,7 +87,7 @@ CREATE TABLE `jobs` (
 
 INSERT INTO `jobs` (`id`, `hotel_id`, `position`, `job_date_start`, `job_date_end`, `start_time`, `end_time`, `category`, `fee`, `location`, `description`, `requirement_skill`, `status`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
 (1, 1, 'Room Attendant', '2026-01-19', '2026-01-20', '07:30:00', '17:30:00', 'daily_worker', 100000, 'Bogor West Java', NULL, NULL, 'open', NULL, NULL, NULL, NULL, NULL, NULL),
-(2, 1, 'Public Area', '2026-01-30', '2026-01-31', '00:00:00', '17:30:00', 'casual', 150000, 'Bogor West Java', NULL, NULL, 'open', NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 1, 'Public Area', '2026-01-30', '2026-01-31', '07:30:00', '17:30:00', 'casual', 150000, 'Bogor West Java', NULL, NULL, 'open', NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 1, 'Front Office', '2026-02-01', '2026-02-02', '07:30:00', '19:30:00', 'daily_worker', 200000, 'Bogor West Java', '', '', 'open', '2026-01-26 01:35:59', NULL, NULL, NULL, NULL, NULL),
 (4, 1, 'FnB Service', '2026-02-01', '2026-02-02', '07:30:00', '17:30:00', 'daily_worker', 250000, 'Bogor West Java', '', '', 'open', '2026-01-26 01:36:37', NULL, NULL, NULL, NULL, NULL),
 (5, 1, 'FnB Product', '2026-02-01', '2026-02-02', '07:30:00', '17:30:00', 'daily_worker', 300000, 'Bogor West Java', '', '', 'open', '2026-01-26 01:36:47', NULL, NULL, NULL, NULL, NULL),
@@ -107,7 +107,7 @@ CREATE TABLE `job_applications` (
   `status` enum('pending','accepted','rejected','completed') DEFAULT 'pending',
   `applied_at` datetime DEFAULT NULL,
   `accepted_at` datetime DEFAULT NULL,
-  `accepted_by` int(11) DEFAULT NULL
+  `accepted_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
@@ -140,14 +140,14 @@ CREATE TABLE `job_attendances` (
   `type` enum('checkin','checkout') NOT NULL,
   `latitude` decimal(10,7) NOT NULL,
   `longitude` decimal(10,7) NOT NULL,
-  `photo_path` varchar(255) NOT NULL,
-  `device_info` varchar(255) DEFAULT NULL,
+  `photo_path` varchar(250) NOT NULL,
+  `device_info` varchar(250) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
-  `created_by` int(11) NOT NULL,
-  `updated_at` datetime NOT NULL,
-  `updated_by` smallint(1) NOT NULL,
-  `deleted_at` datetime NOT NULL,
-  `deleted_by` smallint(1) NOT NULL
+  `created_by` int(1) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` int(1) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -155,8 +155,8 @@ CREATE TABLE `job_attendances` (
 --
 
 INSERT INTO `job_attendances` (`id`, `job_id`, `application_id`, `user_id`, `type`, `latitude`, `longitude`, `photo_path`, `device_info`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
-(1, 2, 2, 2, 'checkin', -6.5944441, 106.7891234, 'uploads/attendance/checkin_1_2_1705654800.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 07:28:45', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
-(2, 2, 2, 2, 'checkout', -6.5944510, 106.7891102, 'uploads/attendance/checkout_1_2_1705689600.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 17:32:10', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
+(1, 2, 2, 3, 'checkin', -6.5944441, 106.7891234, 'uploads/attendance/checkin_1_2_1705654800.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 07:28:45', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
+(2, 2, 2, 3, 'checkout', -6.5944510, 106.7891102, 'uploads/attendance/checkout_1_2_1705689600.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 17:32:10', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
 (3, 3, 3, 3, 'checkin', -6.6015006, 106.7942450, 'uploads/attendance/checkin_3_3_1769945735.jpg', 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36 Edg/144.0.0.0', '2026-02-01 18:35:35', 3, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
 (4, 3, 3, 3, 'checkin', -6.6015006, 106.7942450, 'uploads/attendance/checkin_3_3_1770015659.jpg', 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36 Edg/144.0.0.0', '2026-02-02 14:00:59', 3, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0);
 
@@ -173,7 +173,8 @@ CREATE TABLE `ratings` (
   `worker_id` int(1) NOT NULL,
   `rating` tinyint(4) NOT NULL,
   `review` text DEFAULT NULL,
-  `created_at` datetime DEFAULT NULL
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 -- --------------------------------------------------------
@@ -407,7 +408,43 @@ INSERT INTO `refresh_tokens` (`id`, `user_id`, `token`, `expires_at`, `created_a
 (210, 3, 'f8673b5e151a765f781e65174f4f0eb1d86e37c0d9e56830b0ee93ca17e95ae1afe6e62fb4641f6128139fb1a3922f2400b9a13518c9940578cfd358f7f0cb48', '2026-03-04 07:16:04', '2026-02-02 07:16:04'),
 (211, 3, '2eb0acad503818f0f1eddd92f0cb26679ecdfcf86ca959c0a93f4ced220a4a489da244eec7759a30024c174c281c71ce5339595624a9947cb7e9dcbf92775ec3', '2026-03-04 08:07:45', '2026-02-02 08:07:45'),
 (212, 3, '2f23e0c6d6c661348fbf637c58d4937da125ad976eac1ccca3f3c75fe7b79d1e44aeb33df46ab998912099bc6a3bb2bdf5a8f19e0c88a041128deff88aff31ca', '2026-03-04 08:23:12', '2026-02-02 08:23:12'),
-(213, 3, '706bcab98cc131d113e785bacf919f8affe35295fb27fadfab70183199b0527cf2ee6b4d85c18a0eb687e8138b10438e3bbf9be7a089ffd6c098627e7c03bcdd', '2026-03-04 08:41:36', '2026-02-02 08:41:36');
+(213, 3, '706bcab98cc131d113e785bacf919f8affe35295fb27fadfab70183199b0527cf2ee6b4d85c18a0eb687e8138b10438e3bbf9be7a089ffd6c098627e7c03bcdd', '2026-03-04 08:41:36', '2026-02-02 08:41:36'),
+(214, 3, '9e29430cd25f2f6f771309e8f3981246273ca6c9afdbd7378267e9f1d12dcd21677b7772c37237bbc9fbc80f17ac417d0f29b16700b43234193b9987d891294c', '2026-03-04 09:16:23', '2026-02-02 09:16:23'),
+(215, 3, '50d08a66efe9e7eb6bff99deaff942f6a709f0872b4e1ca7efa4e0a362ab29a34b967fd719630c7c9368626825e7033622c62e1850874fd66ad1db9a8f5e8265', '2026-03-04 09:24:36', '2026-02-02 09:24:36'),
+(216, 3, '4658f13b207150f86ff7a6df68580f10c5206d0ea23d4b43a78ddb2c52f9eab89e587a1b040ed6a525b53114452f929d664c18260846a1adf2d6aca75cf56a37', '2026-03-04 09:27:19', '2026-02-02 09:27:19'),
+(217, 3, 'b962fab1a990902d72eedf92fdc74bff8aac34729a70192490f4b58e4125a43d6b628ee7ecca9b5d3bf2120a7866d96248ee0e4a3b8aeef9a64117fe8ba76777', '2026-03-04 09:28:57', '2026-02-02 09:28:57'),
+(218, 3, 'e3be3586ea8b2129b53f2476d4c5830492804ccddcd980b5b673e37d43e24c11f1155150d891c721a5ae838d25c7b89271c908c55b9a720a0a28759a923fa501', '2026-03-04 09:33:48', '2026-02-02 09:33:48'),
+(219, 3, 'bfd190cedb8a7cc74ad8ef42e9ba5cd15c0256c8dbff12e7d7d79e52fe11ef08c65b835b386adb16ce9981f6429fdfdbf66623fc2b322766d2c050818ea84dda', '2026-03-04 14:04:50', '2026-02-02 14:04:50'),
+(220, 3, '2cc12bb2774b3ef2bf4b85a96ba5b7142691e5796cf0544608aeafa001f8855947ca95ab5b4b47f694a9a265dd5da2705b2ebeac725ff76a87b94b294382ece1', '2026-03-05 06:12:09', '2026-02-03 06:12:09'),
+(221, 3, '8bc4cd5d90b07b2e955e4b980c1d09477902ee049b6ec6d8c696ad94d83d992a5b2192fdfb22f496e54b56370691c33c67f9dc176e00f27bfb3724bd4b33a66e', '2026-03-05 07:01:30', '2026-02-03 07:01:30'),
+(222, 3, '5d751b2a7436e2f1dbefb73abf13b819a9dbe8fd361550bcf33c5fb81efed0b533271e4bc6dd46e6179df655fa3e6e775b8f83a5bcb530799ad695de0c39f9e1', '2026-03-05 07:02:22', '2026-02-03 07:02:22'),
+(223, 3, 'caa3077da924c37e88ddf2e1f7bfc67c7d91ceb513208881e0e2a917707741b82648d7a904a009b420055df823d38fa3a05c44d1317bd20625454f7f906e0bc7', '2026-03-05 07:02:27', '2026-02-03 07:02:27'),
+(224, 3, 'e1618abd7f4bc505e9867bbb72bb3931a27993ecc388129dde6a4cf3bb239eb857aeb7fd36612d75569428f4a70dd1aa24ae909e8832eeed863fe86e5cb4361e', '2026-03-05 07:19:38', '2026-02-03 07:19:38'),
+(225, 3, '8b13ee5724b584f57a28c2e1cafa02cef3af1e1d6e3b5d0de59858bcd62d3d643ee2df61ee6afa2e799bb50b43684cda5d7229d2298078448d0dacb577ac1ee4', '2026-03-05 07:20:34', '2026-02-03 07:20:34'),
+(226, 3, '50dd6d604b415a2fe6ac0d6d852da64bfcc322c8d5244f8c500277082f3fa95aeb9337d175b12cf511eac0c4402690bcfcdac9789cd514fdfae2f34a7946cc35', '2026-03-05 07:37:20', '2026-02-03 07:37:20'),
+(227, 3, '297341f491c65e6bfba437ca23f5adf16541bb3763cab761183453995e704c19d0155f0b5d14294363412ab78331aa5bceb8306f46a40ec0cc45123b52ad82f6', '2026-03-05 07:53:15', '2026-02-03 07:53:15'),
+(228, 3, '48bf24e0be41be277d34ff9ff5604ea5e80f5caf7548df9edbba93d4614cdef3f7db0fc68d21b0937754d070aab727f3813adb7f2666fc4f98319f373adec75f', '2026-03-05 08:10:15', '2026-02-03 08:10:15'),
+(229, 3, 'bd7ed4dee9d5392b52542e828422b583be713d5fa54525136eb5f7b597122404f7e8cfd55c99692bdfc2b0b9edaf4ea45b668c660623fd66c299eea2aa22da42', '2026-03-05 08:24:56', '2026-02-03 08:24:56'),
+(230, 3, '828eebf8fb36b1856382e8daa25e67b00a99b61211ea44eba770d9aa013545d1ec3f604210f1646b2eeeadd6ef107ef5361e2ac39556c6cc539efe9c106a6337', '2026-03-05 08:25:34', '2026-02-03 08:25:34'),
+(231, 3, 'ca791078202a9f2849af7d973cd7ab3e9ccf57a9378799fbfddbf6c92a012b197d07e0432d6af74f10978d492ef79c31b59e545effa0894bd36919e954d1d8ab', '2026-03-05 08:35:37', '2026-02-03 08:35:37'),
+(232, 3, '589bd40dba0908bc61fa851dcdae40e98d386ca85312463382f6786c011304737f9a3c21bb75150fb45b783425094ff2ae6e924f7b3ca5acd29b226912dde4f9', '2026-03-05 08:36:12', '2026-02-03 08:36:12'),
+(233, 3, '007bd8f8942f3ceb5d75b8d08b30a30d633377a72760604683b83585cd4fa5e0511097ea7bf8a31fe33a613060a13db307a38a98c3c1ee1d433939621a4c1748', '2026-03-05 08:38:40', '2026-02-03 08:38:40'),
+(234, 3, '0211163e76c5f7b9c4f4c6229347d6ab48654c5b54c79289b65f0f69698de40fb76760df415eb1cff8ade2babb1ada95effe43c39b69276980e10ae43a04c998', '2026-03-05 08:41:26', '2026-02-03 08:41:26'),
+(235, 3, '3f911b4bb2903322b092d35c8d2c9f5b6d2fc0c49a9939da10f2c1bc22cd92d629a1afa8d2c2dc312263e1376f6a4b507b99ebff9decbfccba5c94cf2e02d7fb', '2026-03-05 09:02:42', '2026-02-03 09:02:42'),
+(236, 3, 'f55181c7d8a0470d5c4ee36b6ede830174e3529c4a70e73cd27be7722ae2cc9566d4818696fa3a75ae0fb84fcd43b84319f1802807301549afc4d0a20869680f', '2026-03-05 09:51:14', '2026-02-03 09:51:14'),
+(237, 3, '546c6aa2f9e9b818006e960ef5a478e4b89bad674b35bee2070617f05da1d4b144557021499799c873854a2f3d2cc1813827ad6f95335441cee07ee47ea21861', '2026-03-05 09:59:38', '2026-02-03 09:59:38'),
+(238, 3, '9e802139d4ec034288f9c8d66a495aea55b9a5f85ea5968d38bc558588821f3c5f1e293945b6af5fc8d7ef5e5bb71bee40a791b716518c7c1ca6468350d99c30', '2026-03-05 10:07:28', '2026-02-03 10:07:28'),
+(239, 3, '60bda0d67ac0ae289e7e7ebd62cda34520b3c576f493c666e9e2bd947bc74515bafffc7236561181b5cc39bfcc7f41f1d1a8f88bf8ce47d24815099c342c6516', '2026-03-05 10:10:10', '2026-02-03 10:10:10'),
+(240, 3, 'b735ea1b2ec2f5cd6ff3850a87a5dde8c4e4c3e1bd6cf4e9290e096027d22f8d90b4eebef5e952e3d21b7f04f6952fb4fc60123b54c0788aa1af11ce1348c716', '2026-03-05 10:36:37', '2026-02-03 10:36:37'),
+(241, 3, 'f608770a2a1983bc83675fc3f8759bfd54fe757fe633cd74232f7536b9dce446c6a47161826b83b286ddd4b3c392ab0478f9085beebd305c9749e77195adf7fc', '2026-03-05 10:38:03', '2026-02-03 10:38:03'),
+(242, 3, '75fba4a0742235bbf1b479abf65b44e9a3acffbc50f439c4e1e6cc6fb954a1ca13df38e79d105bac054b08db2f19716f640af339dc6da79d1a535ed2f2eb58c4', '2026-03-05 10:38:51', '2026-02-03 10:38:51'),
+(243, 3, '0310a1f5ea68305cf08750b1525c4ad6c013bfb615fba77edcb0e1eea3b02dde5df9a5248211d89a60897c5ce3d69a26763127260e33fe14b8e2573cd73b78a9', '2026-03-05 10:41:24', '2026-02-03 10:41:24'),
+(244, 3, 'af4f19bfa8ff0d1c481609d845862f93412ca0da38a7dacae765b78cf869b55b6ae14838adaf5a1168dddd41fa4059ed775cfda2324e5ca4b516052e629503be', '2026-03-05 10:42:30', '2026-02-03 10:42:30'),
+(245, 3, '238e0c5f215bcb45c2f9bd3d0d19eff102027ffb132b03c2c27d0d38eedba50cb6a4c2c1715bd8b51c6018bc2e57f7ba81678abdfdac843b6fb873334b378093', '2026-03-06 14:28:51', '2026-02-04 14:28:51'),
+(246, 3, 'b3fe667a15d31b151ae9903e78dc01a66fafa1494ba259fe1989149cddf3bc72981612ff697dd3a514602cc5f5c41cd4eb39614be6cc1431237d066e0b2f8514', '2026-03-06 16:45:55', '2026-02-04 16:45:55'),
+(247, 3, '3a1d8abd2657bb6c9bf0b9c68eb8488c41c21c38817d1365f81c553b7ee3f6831e710651671721189c25e041072779c79350c42e892f9695522c0f944db13f5e', '2026-03-06 16:46:11', '2026-02-04 16:46:11'),
+(248, 3, '10a4a3ed7fa620500dfd5e8b87ff9aaad8b11a7ea091f68fa4dd72f075378497266225bb5fe3fecd9bfd5ae1c01992d9a368750e75c29f3bbb6c6986bab25d71', '2026-03-06 16:46:36', '2026-02-04 16:46:36'),
+(249, 3, 'da0eada94b26dfcd45cf3a6bac5ff7ecf38380bd324238a1a0f2f7e6f85880b10edd3dff3c8c6d7c27bb8a9f69ef215dae1cf37c2d9435e651b57e59c79a2ccc', '2026-03-06 16:47:18', '2026-02-04 16:47:18');
 
 -- --------------------------------------------------------
 
@@ -493,6 +530,7 @@ CREATE TABLE `users` (
   `provider_id` varchar(100) DEFAULT NULL,
   `photo` varchar(250) DEFAULT NULL,
   `is_verified` tinyint(4) DEFAULT 0,
+  `is_active` enum('active','inactive') DEFAULT 'active',
   `created_at` datetime DEFAULT NULL,
   `created_by` int(1) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -505,10 +543,10 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `hotel_id`, `role`, `name`, `email`, `phone`, `password`, `provider`, `provider_id`, `photo`, `is_verified`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
-(1, 0, 'worker', 'Mick Jagger', 'admin@admin.com', '0812', '$2y$10$TYZN8k0YxaB.jxCtqA4sl.JnllEeN3/UF9oGYK5.LTvbGlCe7HE82', 'local', NULL, NULL, 0, '2026-01-18 12:25:53', 1, NULL, NULL, NULL, NULL),
-(2, 0, 'worker', 'Arya Seftian', 'yerblues6@gmail.com', '895330907220', '$2y$10$ziaDpWwWk3gBjVGu6XqmoebCqmePQwtuwaRGY5ggXBpOI/.Wubhq.', 'local', NULL, 'uploads/profiles/profile_2_1768811928.png', 0, '2026-01-18 18:59:55', NULL, '2026-01-19 08:38:48', NULL, NULL, NULL),
-(3, 0, 'worker', 'Muhammad', 'muhammad@gmail.com', '99988776', '$2y$10$relLlluCofLYvJKJDW65zuxFadTF4X4A.mCur9V2uEbiZVW8vGhaa', 'local', NULL, 'uploads/profiles/profile_3_1768820480.png', 0, '2026-01-19 10:53:08', NULL, '2026-01-19 11:01:20', NULL, NULL, NULL);
+INSERT INTO `users` (`id`, `hotel_id`, `role`, `name`, `email`, `phone`, `password`, `provider`, `provider_id`, `photo`, `is_verified`, `is_active`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
+(1, 0, 'worker', 'Mick Jagger', 'admin@admin.com', '0812', '$2y$10$TYZN8k0YxaB.jxCtqA4sl.JnllEeN3/UF9oGYK5.LTvbGlCe7HE82', 'local', NULL, NULL, 0, 'active', '2026-01-18 12:25:53', 1, NULL, NULL, NULL, NULL),
+(2, 0, 'worker', 'Arya Seftian', 'yerblues6@gmail.com', '895330907220', '$2y$10$ziaDpWwWk3gBjVGu6XqmoebCqmePQwtuwaRGY5ggXBpOI/.Wubhq.', 'local', NULL, 'uploads/profiles/profile_2_1768811928.png', 0, 'active', '2026-01-18 18:59:55', NULL, '2026-01-19 08:38:48', NULL, NULL, NULL),
+(3, 0, 'admin', 'Muhammad', 'muhammad@gmail.com', '99988776', '$2y$10$relLlluCofLYvJKJDW65zuxFadTF4X4A.mCur9V2uEbiZVW8vGhaa', 'local', NULL, 'uploads/profiles/profile_3_1768820480.png', 0, 'active', '2026-01-19 10:53:08', NULL, '2026-02-03 10:39:03', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -520,16 +558,17 @@ CREATE TABLE `worker_documents` (
   `id` int(1) NOT NULL,
   `user_id` int(1) NOT NULL,
   `type` enum('ktp','certificate','other') DEFAULT 'other',
-  `file_path` varchar(255) NOT NULL,
-  `created_at` datetime DEFAULT NULL
+  `file_path` varchar(250) NOT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `worker_documents`
 --
 
-INSERT INTO `worker_documents` (`id`, `user_id`, `type`, `file_path`, `created_at`) VALUES
-(2, 3, 'ktp', 'uploads/documents/doc_3_1770021829.jpeg', NULL);
+INSERT INTO `worker_documents` (`id`, `user_id`, `type`, `file_path`, `created_at`, `created_by`) VALUES
+(2, 3, 'ktp', 'uploads/documents/doc_3_1770021829.jpeg', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -546,13 +585,13 @@ CREATE TABLE `worker_educations` (
   `start_date` varchar(7) NOT NULL,
   `end_date` varchar(7) NOT NULL,
   `is_current` tinyint(1) NOT NULL,
-  `sort_order` int(11) NOT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `created_by` int(11) NOT NULL,
+  `sort_order` int(1) DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `created_by` int(1) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
-  `updated_by` smallint(1) NOT NULL,
+  `updated_by` int(1) DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` smallint(1) DEFAULT NULL
+  `deleted_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -560,7 +599,8 @@ CREATE TABLE `worker_educations` (
 --
 
 INSERT INTO `worker_educations` (`id`, `user_id`, `level`, `title`, `instituted_name`, `start_date`, `end_date`, `is_current`, `sort_order`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
-(6, 3, 'S1', 'Sarjana Informatika', 'Universitas Nusa Mandiri', '2026-01', '2026-12', 0, 0, '2026-02-02 15:29:28', 3, NULL, 0, NULL, NULL);
+(1, 3, 'S1', 'Sarjana Informatika', 'Universitas Nusa Mandiri', '2025-01', '2026-01', 0, 0, '2026-02-02 16:29:38', 3, '2026-02-02 16:41:01', 0, NULL, NULL),
+(2, 3, 'S2', 'Ilmu Komputer', 'Universitas Nusa Mandiri', '2026-01', '', 1, 0, '2026-02-02 16:29:38', 3, NULL, 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -580,13 +620,13 @@ CREATE TABLE `worker_experiences` (
   `end_date` varchar(7) DEFAULT NULL,
   `is_current` tinyint(1) DEFAULT 0,
   `description` text DEFAULT NULL,
-  `sort_order` int(11) DEFAULT 0,
+  `sort_order` int(1) DEFAULT 0,
   `created_at` datetime DEFAULT current_timestamp(),
-  `created_by` int(11) DEFAULT NULL,
+  `created_by` int(1) DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
-  `updated_by` int(11) DEFAULT NULL,
+  `updated_by` int(1) DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
-  `deleted_by` int(11) DEFAULT NULL
+  `deleted_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -594,7 +634,8 @@ CREATE TABLE `worker_experiences` (
 --
 
 INSERT INTO `worker_experiences` (`id`, `user_id`, `company_name`, `company_business`, `job_title`, `department`, `location`, `start_date`, `end_date`, `is_current`, `description`, `sort_order`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
-(1, 3, 'Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet', '2026-02', NULL, 1, 'Lorem', 0, '2026-02-01 13:41:48', 3, '2026-02-01 13:41:48', NULL, NULL, NULL);
+(1, 3, 'Lorem', 'Ipsum', 'Dolor', 'Sit', 'Amet', '2026-01', NULL, 1, 'Oke', 0, '2026-02-02 09:29:15', 3, '2026-02-02 09:29:15', NULL, NULL, NULL),
+(2, 3, 'Sahira', 'Hotel', 'SE', 'IT', 'Bogor', '2025-01', '2026-01', 0, 'Oke', 0, '2026-02-02 09:29:15', 3, '2026-02-02 16:35:02', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -631,20 +672,20 @@ INSERT INTO `worker_profiles` (`id`, `user_id`, `gender`, `birth_date`, `address
 --
 
 CREATE TABLE `worker_ratings` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `comments` int(11) NOT NULL,
-  `punctuality` int(11) NOT NULL,
-  `apperance` int(11) NOT NULL,
-  `knowledge` int(11) NOT NULL,
-  `durability` int(11) NOT NULL,
-  `ethics` int(11) NOT NULL,
+  `id` int(1) NOT NULL,
+  `user_id` int(1) DEFAULT NULL,
+  `comments` int(1) NOT NULL,
+  `punctuality` int(1) NOT NULL,
+  `apperance` int(1) NOT NULL,
+  `knowledge` int(1) NOT NULL,
+  `durability` int(1) NOT NULL,
+  `ethics` int(1) NOT NULL,
   `created_at` datetime NOT NULL,
   `created_by` int(1) NOT NULL,
-  `updated_at` datetime NOT NULL,
-  `updated_by` smallint(1) NOT NULL,
-  `deleted_at` datetime NOT NULL,
-  `deleted_by` smallint(1) NOT NULL
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` int(1) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -654,16 +695,16 @@ CREATE TABLE `worker_ratings` (
 --
 
 CREATE TABLE `worker_reviews` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `comments` int(11) NOT NULL,
-  `stars` int(11) DEFAULT NULL,
+  `id` int(1) NOT NULL,
+  `user_id` int(1) DEFAULT NULL,
+  `comments` int(1) NOT NULL,
+  `stars` int(1) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `created_by` int(1) NOT NULL,
-  `updated_at` datetime NOT NULL,
-  `updated_by` smallint(1) NOT NULL,
-  `deleted_at` datetime NOT NULL,
-  `deleted_by` smallint(1) NOT NULL
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` int(1) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -832,7 +873,7 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=214;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=250;
 
 --
 -- AUTO_INCREMENT for table `skills`
@@ -856,13 +897,13 @@ ALTER TABLE `worker_documents`
 -- AUTO_INCREMENT for table `worker_educations`
 --
 ALTER TABLE `worker_educations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `worker_experiences`
 --
 ALTER TABLE `worker_experiences`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `worker_profiles`
@@ -874,13 +915,13 @@ ALTER TABLE `worker_profiles`
 -- AUTO_INCREMENT for table `worker_ratings`
 --
 ALTER TABLE `worker_ratings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `worker_reviews`
 --
 ALTER TABLE `worker_reviews`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `worker_skills`

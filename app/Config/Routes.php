@@ -28,6 +28,8 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
     $routes->post('hotels/get', 'Admin\Hotels::getById', ['filter' => 'role:admin']);
     $routes->post('hotels/update', 'Admin\Hotels::update', ['filter' => 'role:admin']);
     $routes->post('hotels/delete', 'Admin\Hotels::delete', ['filter' => 'role:admin']);
+    $routes->get('hotels/calendar', 'Admin\Hotels::calendar', ['filter' => 'role:admin']);
+    $routes->get('hotels/calendar-attendance/(:num)', 'Admin\Hotels::attendanceByJob/$1', ['filter' => 'role:admin']);
     
 });
 
@@ -40,6 +42,7 @@ $routes->group('api', function($routes) {
 });
 
 $routes->group('api', ['filter' => 'jwt'], function($routes) {
+
     // =========================
     // WORKER PROFILE
     // =========================
@@ -75,7 +78,7 @@ $routes->group('api', ['filter' => 'jwt'], function($routes) {
     $routes->get('worker/applications/(:num)', 'Api\WorkerController::applicationDetail/$1');
 
     // =========================
-    // ATTENDANCE (FIXED)
+    // ATTENDANCE 🔥 (FIXED)
     // =========================
 
     // list attendance (schedule)

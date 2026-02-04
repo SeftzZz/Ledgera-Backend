@@ -165,5 +165,4 @@ class JobController extends BaseController
             'job_id'  => $this->job->getInsertID()
         ]);
     }
-
-}
+}  

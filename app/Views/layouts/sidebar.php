@@ -32,6 +32,12 @@
                               <div data-i18n="Attendance">Attendance</div>
                             </a>
                         </li>
+                        <li class="menu-item <?= ($uri=='users')?'active':'' ?>">
+                            <a href="<?= base_url('admin/users') ?>" class="menu-link">
+                              <i class="menu-icon tf-icons ti ti-users"></i>
+                              <div data-i18n="Users">Users</div>
+                            </a>
+                        </li>
                         <li class="menu-item">
                             <a href="<?= base_url('logout') ?>" class="menu-link">
                                 <i class="menu-icon tf-icons ti ti-logout"></i>

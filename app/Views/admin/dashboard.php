@@ -166,7 +166,7 @@
                           window.events = [];
                           window.calendarsColor = {};
 
-                          fetch('<?= base_url('admin/hotels/calendar') ?>')
+                          fetch('<?= base_url('admin/dashboard/calendar') ?>')
                             .then(res => res.json())
                             .then(data => {
 
@@ -301,7 +301,7 @@
                                 container.innerHTML =
                                   '<div class="text-muted">Loading attendance...</div>';
 
-                                fetch(`<?= base_url('admin/hotels/calendar-attendance') ?>/${jobId}`)
+                                fetch(`<?= base_url('admin/dashboard/calendar-attendance') ?>/${jobId}`)
                                   .then(res => res.json())
                                   .then(rows => {
 

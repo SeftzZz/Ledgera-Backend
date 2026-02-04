@@ -1,41 +1,33 @@
-            <?= $this->extend('layouts/admin') ?>
-            <?= $this->section('content') ?>
-                <style>
-                    .camera-preview {
-                        height: 240px;
-                        background: #000;
-                        border-radius: 8px;
-                        overflow: hidden;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    }
-
-                    .camera-preview video {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover;
-                        transform: scaleX(-1);
-                    }
-                </style>
-                
-                <div class="content-wrapper">
-                    <!-- Content Header (Page header) -->
-                    <section class="content-header">
-                        <div class="container-fluid">
-                            <div class="row mb-2">
-                                <div class="col-sm-6">
-                                    <h1>Absensi</h1>
-                                </div>
-                                <div class="col-sm-6">
-                                    <ol class="breadcrumb float-sm-right">
-                                        <li class="breadcrumb-item"><a href="<?= base_url('admin/dashboard') ?>">Dashboard</a></li>
-                                        <li class="breadcrumb-item active">Absensi</li>
-                                    </ol>
+                        <?= $this->extend('layouts/main') ?>
+                        <?= $this->section('content') ?>
+                            <div class="container-xxl flex-grow-1 container-p-y">
+                                <div class="card">
+                                    <div class="card-datatable table-responsive pt-0">
+                                        <table class="dtHotel table">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th>No.</th>
+                                                    <th>Hotel Name</th>
+                                                    <th>Address</th>
+                                                    <th>Latitude</th>
+                                                    <th>Longitude</th>
+                                                    <th>Website</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
-                    <!-- /.content header -->
-                </div>
-            <?= $this->endSection() ?>
+                        <?= $this->endSection() ?>
+
+                        <?= $this->section('scripts') ?>
+                        <!-- DataTables -->
+                        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') ?>" />
+                        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') ?>" />
+                        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css') ?>" />
+                        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css') ?>" />
+                        <script src="<?= base_url('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') ?>"></script>
+                        <?= $this->endSection() ?>

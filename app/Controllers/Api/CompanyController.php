@@ -17,7 +17,6 @@ class CompanyController extends BaseController
     public function index()
     {
         $company = $this->companyModel
-            ->where('deleted_at', '0000-00-00 00:00:00')
             ->findAll();
 
         return $this->response->setJSON($company);

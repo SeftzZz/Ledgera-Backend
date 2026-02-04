@@ -23,13 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
       appCalendarSidebar = document.querySelector('.app-calendar-sidebar'),
       addEventSidebar = document.getElementById('addEventSidebar'),
       appOverlay = document.querySelector('.app-overlay'),
-      calendarsColor = {
-        Business: 'primary',
-        Holiday: 'success',
-        Personal: 'danger',
-        Family: 'warning',
-        ETC: 'info'
-      },
+      calendarsColor = window.calendarsColor,
       offcanvasTitle = document.querySelector('.offcanvas-title'),
       btnToggleSidebar = document.querySelector('.btn-toggle-sidebar'),
       btnSubmit = document.querySelector('button[type="submit"]'),
@@ -49,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
       inlineCalendar = document.querySelector('.inline-calendar');
 
     let eventToUpdate,
-      currentEvents = events, // Assign app-calendar-events.js file events (assume events from API) to currentEvents (browser store/object) to manage and update calender events
+      currentEvents = window.events || [], // Assign app-calendar-events.js file events (assume events from API) to currentEvents (browser store/object) to manage and update calender events
       isFormValid = false,
       inlineCalInstance;
 
@@ -250,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Init FullCalendar
     // ------------------------------------------------
-    let calendar = new Calendar(calendarEl, {
+    window.calendar = new Calendar(calendarEl, {
       initialView: 'dayGridMonth',
       events: fetchEvents,
       plugins: [dayGridPlugin, interactionPlugin, listPlugin, timegridPlugin],

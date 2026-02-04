@@ -20,7 +20,6 @@
 						                </table>
 					                </div>
 
-					                //add modal
 					                <div class="modal fade" id="modalAddHotel" tabindex="-1" aria-hidden="true">
 									    <div class="modal-dialog modal-lg modal-dialog-centered">
 									        <div class="modal-content">
@@ -87,7 +86,6 @@
 									    </div>
 									</div>
 
-					                //edit modal
 					                <div class="modal fade" id="modalEditHotel" tabindex="-1" aria-hidden="true">
 										<div class="modal-dialog modal-lg modal-dialog-centered">
 										    <div class="modal-content">

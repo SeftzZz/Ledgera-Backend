@@ -21,6 +21,8 @@ $routes->get('logout', 'Auth\Login::logout');
 
 $routes->group('admin', ['filter' => 'auth'], function($routes) {
     $routes->get('dashboard', 'Admin\Dashboard::index');
+    $routes->get('dashboard/calendar', 'Admin\Dashboard::calendar', ['filter' => 'role:admin']);
+    $routes->get('dashboard/calendar-attendance/(:num)', 'Admin\Dashboard::attendanceByJob/$1', ['filter' => 'role:admin']);
 
     $routes->get('hotels', 'Admin\Hotels::index', ['filter' => 'role:admin']);
     $routes->post('hotels/datatable', 'Admin\Hotels::datatable', ['filter' => 'role:admin']);
@@ -28,9 +30,10 @@ $routes->group('admin', ['filter' => 'auth'], function($routes) {
     $routes->post('hotels/get', 'Admin\Hotels::getById', ['filter' => 'role:admin']);
     $routes->post('hotels/update', 'Admin\Hotels::update', ['filter' => 'role:admin']);
     $routes->post('hotels/delete', 'Admin\Hotels::delete', ['filter' => 'role:admin']);
-    $routes->get('hotels/calendar', 'Admin\Hotels::calendar', ['filter' => 'role:admin']);
-    $routes->get('hotels/calendar-attendance/(:num)', 'Admin\Hotels::attendanceByJob/$1', ['filter' => 'role:admin']);
-    
+
+    $routes->get('attendance', 'Admin\Attendance::index', ['filter' => 'role:admin']);
+    $routes->post('attendance/datatable', 'Admin\Attendance::datatable', ['filter' => 'role:admin']);
+    $routes->post('attendance/detail', 'Admin\Attendance::detail', ['filter' => 'role:admin']);
 });
 
 $routes->group('api', function($routes) {

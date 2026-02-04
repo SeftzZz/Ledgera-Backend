@@ -26,6 +26,12 @@
                               <div data-i18n="Hotels">Hotels</div>
                             </a>
                         </li>
+                        <li class="menu-item <?= ($uri=='attendance')?'active':'' ?>">
+                            <a href="<?= base_url('admin/attendance') ?>" class="menu-link">
+                              <i class="menu-icon tf-icons ti ti-list"></i>
+                              <div data-i18n="Attendance">Attendance</div>
+                            </a>
+                        </li>
                         <li class="menu-item">
                             <a href="<?= base_url('logout') ?>" class="menu-link">
                                 <i class="menu-icon tf-icons ti ti-logout"></i>

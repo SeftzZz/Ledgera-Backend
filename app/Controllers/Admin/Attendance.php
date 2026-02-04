@@ -109,26 +109,31 @@ class Attendance extends BaseAdminController
             $checkin  = $row['checkin_time'];
             $checkout = $row['checkout_time'];
 
-            $duration = '-';
-            $status   = 'Incomplete';
+            $duration      = '-';
+            $tenMinutesCnt = '-';
+            $status        = 'Incomplete';
 
             if ($checkin && $checkout) {
                 $seconds  = strtotime($checkout) - strtotime($checkin);
-                $duration = gmdate('H:i', $seconds);
-                $status   = 'Complete';
+                $minutes  = floor($seconds / 60);
+
+                $duration      = gmdate('H:i', $seconds);
+                $tenMinutesCnt = floor($minutes / 10); // jumlah kelipatan 10 menit
+                $status        = 'Complete';
             }
 
             $data[] = [
-                'no'       => $no++,
-                'date'     => $row['work_date'],
-                'worker'   => esc($row['worker_name']),
-                'hotel'    => esc($row['hotel_name']),
-                'job'      => esc($row['position']),
-                'checkin'  => $checkin ? date('H:i', strtotime($checkin)) : '-',
-                'checkout' => $checkout ? date('H:i', strtotime($checkout)) : '-',
-                'duration' => $duration,
-                'status'   => $status,
-                'action'   => '
+                'no'          => $no++.'.',
+                'date'        => date('d-m-Y', strtotime($row['work_date'])),
+                'worker'      => esc($row['worker_name']),
+                'hotel'       => esc($row['hotel_name']),
+                'job'         => esc($row['position']),
+                'checkin'     => $checkin ? date('H:i', strtotime($checkin)) : '-',
+                'checkout'    => $checkout ? date('H:i', strtotime($checkout)) : '-',
+                'duration'    => $duration,
+                'ten_minutes' => $tenMinutesCnt,
+                'status'      => $status,
+                'action'      => '
                     <button 
                         class="btn btn-sm btn-info btn-detail"
                         data-user="'.$row['user_id'].'"

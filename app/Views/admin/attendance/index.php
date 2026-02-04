@@ -16,6 +16,7 @@
                                                 <th>Check In</th>
                                                 <th>Check Out</th>
                                                 <th>Duration</th>
+                                                <th>10 Min Count</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
@@ -146,39 +147,22 @@
                                             { data: 'checkin' },
                                             { data: 'checkout' },
                                             { data: 'duration' },
+                                            { data: 'ten_minutes' },
                                             { data: 'status' },
                                             { data: 'action' }
                                         ],
 
                                         columnDefs: [
+                                            { targets: 0, className: 'control', orderable: false, searchable: false },
+                                            { targets: 1, orderable: false, searchable: false },
                                             {
-                                                className: 'control',
-                                                orderable: false,
-                                                searchable: false,
-                                                responsivePriority: 2,
-                                                targets: 0,
-                                                render: () => ''
-                                            },
-                                            {
-                                                targets: 1,
-                                                orderable: false,
-                                                searchable: false
-                                            },
-                                            {
-                                                targets: -1,
-                                                title: 'Action',
-                                                orderable: false,
-                                                searchable: false
-                                            },
-                                            {
-                                                targets: 9,
+                                                targets: 10,
                                                 render: function (data) {
-                                                    let badge = data === 'Complete'
-                                                        ? 'success'
-                                                        : 'warning';
+                                                    let badge = data === 'Complete' ? 'success' : 'warning';
                                                     return `<span class="badge bg-${badge}">${data}</span>`;
                                                 }
-                                            }
+                                            },
+                                            { targets: -1, orderable: false, searchable: false }
                                         ],
 
                                         order: [[2, 'desc']],

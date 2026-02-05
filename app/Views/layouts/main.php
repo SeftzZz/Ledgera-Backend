@@ -93,13 +93,12 @@
         <script src="<?= base_url('assets/vendor/js/menu.js') ?>"></script>
         <!-- endbuild -->
 
-        <!-- Vendors JS -->
-        <?= $this->renderSection('scripts') ?>
-        <script src="<?= base_url('assets/vendor/libs/sweetalert2/sweetalert2new.js') ?>"></script>
-
-        
         <!-- Main JS -->
         <script src="<?= base_url('assets/js/main.js') ?>"></script>
+
+        <!-- Vendors JS -->
+        <script src="<?= base_url('assets/vendor/libs/sweetalert2/sweetalert2new.js') ?>"></script>
+        <?= $this->renderSection('scripts') ?>
 
         <!-- Page JS -->
     </body>

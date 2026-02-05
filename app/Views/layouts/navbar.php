@@ -8,20 +8,77 @@
                         </div>
 
                         <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-                            <!-- Search -->
-                            <!-- <div class="navbar-nav align-items-center">
-                                <div class="nav-item navbar-search-wrapper mb-0">
-                                    <a class="nav-item nav-link search-toggler d-flex align-items-center px-0" href="javascript:void(0);">
-                                        <i class="ti ti-search ti-md me-2"></i>
-                                        <span class="d-none d-md-inline-block text-muted">Search</span>
-                                    </a>
+                            <!-- Info hotel -->
+                            <?php
+                                use App\Models\HotelModel;
+                                $hotelId      = session()->get('hotel_id') ?? 0;
+
+                                // Default
+                                if ($hotelId == 0) {
+                                    $hotelName    = 'Hey Work Corp';
+                                    $hotelLoc     = 'Bogor, West Java';
+                                    $hotelWebsite = 'www.heywork.com';
+                                    $hotelLogo    = 'images/heywork48.png';
+                                }
+
+                                if ($hotelId != 0) {
+                                    $hotelModel = new HotelModel();
+                                    $hotel = $hotelModel
+                                        ->select('hotel_name, location, website, logo')
+                                        ->where('id', $hotelId)
+                                        ->first();
+
+                                    if ($hotel) {
+                                        $hotelName    = $hotel['hotel_name'];
+                                        $hotelLoc     = $hotel['location'];
+                                        $hotelWebsite = $hotel['website'];
+                                        $hotelLogo    = $hotel['logo'];
+                                    }
+                                }
+
+                                // Inisial hotel
+                                $hotelInitials = '';
+                                foreach (explode(' ', $hotelName) as $w) {
+                                    if ($w !== '') {
+                                        $hotelInitials .= strtoupper(substr($w, 0, 1));
+                                    }
+                                }
+                                $hotelInitials = substr($hotelInitials, 0, 2);
+                            ?>
+
+                            <div class="navbar-nav align-items-center">
+                                <div class="d-flex align-items-center gap-2">
+                                    <!-- Logo / Initial -->
+                                    <div class="avatar avatarNav-sm">
+                                        <?php if (!empty($hotelLogo) && file_exists(FCPATH . $hotelLogo)): ?>
+                                            <img src="<?= base_url($hotelLogo) ?>" class="rounded-circleColor" />
+                                        <?php else: ?>
+                                            <span class="avatar-initial rounded-circle bg-label-primary">
+                                                <?= esc($hotelInitials) ?>
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- Hotel Info -->
+                                    <div class="d-none d-md-flex flex-column lh-sm">
+                                        <span class="fw-medium text-body"><?= esc($hotelName) ?></span>
+                                        <small class="text-muted"><?= esc($hotelLoc) ?></small>
+                                    </div>
+
+                                    <!-- Website -->
+                                    <?php if (!empty($hotelWebsite)): ?>
+                                        <a href="<?= 'https://' . esc($hotelWebsite) ?>" target="_blank"
+                                           class="ms-2 text-muted d-none d-lg-inline">
+                                            <i class="ti ti-world"></i> <?= esc($hotelWebsite) ?>
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
-                            </div> -->
-                            <!-- /Search -->
+                            </div>
+                            <!-- /Info hotel -->
 
                             <ul class="navbar-nav flex-row align-items-center ms-auto">
                                 <!-- Language -->
-                                <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
+                                <!-- <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
                                     <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                                         <i class="ti ti-language rounded-circle ti-md"></i>
                                     </a>
@@ -31,13 +88,13 @@
                                                 <span class="align-middle">English</span>
                                             </a>
                                         </li>
-                                        <!-- <li>
+                                        <li>
                                             <a class="dropdown-item" href="javascript:void(0);" data-language="fr" data-text-direction="ltr">
                                                 <span class="align-middle">French</span>
                                             </a>
-                                        </li> -->
+                                        </li>
                                     </ul>
-                                </li>
+                                </li> -->
                                 <!--/ Language -->
 
                                 <!-- Notification -->
@@ -49,7 +106,7 @@
                                         data-bs-auto-close="outside"
                                         aria-expanded="false">
                                             <i class="ti ti-bell ti-md"></i>
-                                            <span class="badge bg-danger rounded-pill badge-notifications">5</span>
+                                            <span class="badge bg-danger rounded-pill badge-notifications">2</span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end py-0">
                                         <li class="dropdown-menu-header border-bottom">
@@ -133,144 +190,6 @@
                                                 </div>
                                               </div>
                                             </li>
-                                            <li class="list-group-item list-group-item-action dropdown-notifications-item">
-                                              <div class="d-flex">
-                                                <div class="flex-shrink-0 me-3">
-                                                  <div class="avatar">
-                                                    <span class="avatar-initial rounded-circle bg-label-success"
-                                                      ><i class="ti ti-shopping-cart"></i
-                                                    ></span>
-                                                  </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                  <h6 class="mb-1">Whoo! You have new order 🛒</h6>
-                                                  <p class="mb-0">ACME Inc. made new order $1,154</p>
-                                                  <small class="text-muted">1 day ago</small>
-                                                </div>
-                                                <div class="flex-shrink-0 dropdown-notifications-actions">
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-read"
-                                                    ><span class="badge badge-dot"></span
-                                                  ></a>
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-archive"
-                                                    ><span class="ti ti-x"></span
-                                                  ></a>
-                                                </div>
-                                              </div>
-                                            </li>
-                                            <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                                              <div class="d-flex">
-                                                <div class="flex-shrink-0 me-3">
-                                                  <div class="avatar">
-                                                    <img src="<?= base_url('assets/img/avatars/9.png') ?>" alt class="h-auto rounded-circle" />
-                                                  </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                  <h6 class="mb-1">Application has been approved 🚀</h6>
-                                                  <p class="mb-0">Your ABC project application has been approved.</p>
-                                                  <small class="text-muted">2 days ago</small>
-                                                </div>
-                                                <div class="flex-shrink-0 dropdown-notifications-actions">
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-read"
-                                                    ><span class="badge badge-dot"></span
-                                                  ></a>
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-archive"
-                                                    ><span class="ti ti-x"></span
-                                                  ></a>
-                                                </div>
-                                              </div>
-                                            </li>
-                                            <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                                              <div class="d-flex">
-                                                <div class="flex-shrink-0 me-3">
-                                                  <div class="avatar">
-                                                    <span class="avatar-initial rounded-circle bg-label-success"
-                                                      ><i class="ti ti-chart-pie"></i
-                                                    ></span>
-                                                  </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                  <h6 class="mb-1">Monthly report is generated</h6>
-                                                  <p class="mb-0">July monthly financial report is generated</p>
-                                                  <small class="text-muted">3 days ago</small>
-                                                </div>
-                                                <div class="flex-shrink-0 dropdown-notifications-actions">
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-read"
-                                                    ><span class="badge badge-dot"></span
-                                                  ></a>
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-archive"
-                                                    ><span class="ti ti-x"></span
-                                                  ></a>
-                                                </div>
-                                              </div>
-                                            </li>
-                                            <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                                              <div class="d-flex">
-                                                <div class="flex-shrink-0 me-3">
-                                                  <div class="avatar">
-                                                    <img src="<?= base_url('assets/img/avatars/5.png') ?>" alt class="h-auto rounded-circle" />
-                                                  </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                  <h6 class="mb-1">Send connection request</h6>
-                                                  <p class="mb-0">Peter sent you connection request</p>
-                                                  <small class="text-muted">4 days ago</small>
-                                                </div>
-                                                <div class="flex-shrink-0 dropdown-notifications-actions">
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-read"
-                                                    ><span class="badge badge-dot"></span
-                                                  ></a>
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-archive"
-                                                    ><span class="ti ti-x"></span
-                                                  ></a>
-                                                </div>
-                                              </div>
-                                            </li>
-                                            <li class="list-group-item list-group-item-action dropdown-notifications-item">
-                                              <div class="d-flex">
-                                                <div class="flex-shrink-0 me-3">
-                                                  <div class="avatar">
-                                                    <img src="<?= base_url('assets/img/avatars/6.png') ?>" alt class="h-auto rounded-circle" />
-                                                  </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                  <h6 class="mb-1">New message from Jane</h6>
-                                                  <p class="mb-0">Your have new message from Jane</p>
-                                                  <small class="text-muted">5 days ago</small>
-                                                </div>
-                                                <div class="flex-shrink-0 dropdown-notifications-actions">
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-read"
-                                                    ><span class="badge badge-dot"></span
-                                                  ></a>
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-archive"
-                                                    ><span class="ti ti-x"></span
-                                                  ></a>
-                                                </div>
-                                              </div>
-                                            </li>
-                                            <li class="list-group-item list-group-item-action dropdown-notifications-item marked-as-read">
-                                              <div class="d-flex">
-                                                <div class="flex-shrink-0 me-3">
-                                                  <div class="avatar">
-                                                    <span class="avatar-initial rounded-circle bg-label-warning"
-                                                      ><i class="ti ti-alert-triangle"></i
-                                                    ></span>
-                                                  </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                  <h6 class="mb-1">CPU is running high</h6>
-                                                  <p class="mb-0">CPU Utilization Percent is currently at 88.63%,</p>
-                                                  <small class="text-muted">5 days ago</small>
-                                                </div>
-                                                <div class="flex-shrink-0 dropdown-notifications-actions">
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-read"
-                                                    ><span class="badge badge-dot"></span
-                                                  ></a>
-                                                  <a href="javascript:void(0)" class="dropdown-notifications-archive"
-                                                    ><span class="ti ti-x"></span
-                                                  ></a>
-                                                </div>
-                                              </div>
-                                            </li>
                                           </ul>
                                         </li>
                                         <li class="dropdown-menu-footer border-top">
@@ -285,27 +204,74 @@
                                 <!--/ Notification -->
 
                                 <!-- User -->
+                                <?php
+                                  $userName  = session()->get('user_name') ?? 'User';
+                                  $userRole  = session()->get('user_role') ?? '';
+                                  $userPhoto = session()->get('user_photo');
+
+                                  // Ambil inisial nama
+                                  $initials = '';
+                                  $names = explode(' ', trim($userName));
+                                  foreach ($names as $n) {
+                                      if ($n !== '') {
+                                          $initials .= strtoupper(substr($n, 0, 1));
+                                      }
+                                  }
+                                  $initials = substr($initials, 0, 2);
+
+                                  // Mapping role
+                                  $roleMap = [
+                                      'admin'                => 'Admin HW',
+                                      'worker'               => 'Mitra',
+                                      'hotel_hr'             => 'User HR',
+                                      'hotel_fo'             => 'User FO',
+                                      'hotel_hk'             => 'User HK',
+                                      'hotel_fnb_service'    => 'User FnBS',
+                                      'hotel_fnb_production' => 'User FnBP',
+                                  ];
+
+                                  $roleLabel = $roleMap[$userRole] ?? ucfirst($userRole);
+                                ?>
+
                                 <li class="nav-item navbar-dropdown dropdown-user dropdown">
                                     <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
                                         <div class="avatar avatar-online">
-                                            <img src="<?= base_url('assets/img/avatars/1.png') ?>" alt class="h-auto rounded-circle" />
+                                            <?php if (!empty($userPhoto) && file_exists(FCPATH . $userPhoto)): ?>
+                                                <img src="<?= base_url($userPhoto) ?>" class="h-auto rounded-circleColor" />
+                                            <?php else: ?>
+                                                <span
+                                                    class="avatar-initial rounded-circle bg-label-primary">
+                                                    <?= esc($initials) ?>
+                                                </span>
+                                            <?php endif; ?>
                                         </div>
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li>
-                                          <a class="dropdown-item" href="pages-account-settings-account.html">
-                                            <div class="d-flex">
-                                              <div class="flex-shrink-0 me-3">
-                                                <div class="avatar avatar-online">
-                                                  <img src="<?= base_url('assets/img/avatars/1.png') ?>" alt class="h-auto rounded-circle" />
+                                            <a class="dropdown-item" href="#">
+                                                <div class="d-flex">
+                                                    <div class="flex-shrink-0 me-3">
+                                                        <div class="avatar avatar-online">
+                                                            <?php if (!empty($userPhoto) && file_exists(FCPATH . $userPhoto)): ?>
+                                                                <img src="<?= base_url($userPhoto) ?>" class="h-auto rounded-circleColor" />
+                                                            <?php else: ?>
+                                                                <span
+                                                                    class="avatar-initial rounded-circle bg-label-primary">
+                                                                    <?= esc($initials) ?>
+                                                                </span>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <span class="fw-medium d-block">
+                                                            <?= esc($userName) ?>
+                                                        </span>
+                                                        <small class="text-muted">
+                                                            <?= esc($roleLabel) ?>
+                                                        </small>
+                                                    </div>
                                                 </div>
-                                              </div>
-                                              <div class="flex-grow-1">
-                                                <span class="fw-medium d-block">John Doe</span>
-                                                <small class="text-muted">Admin</small>
-                                              </div>
-                                            </div>
-                                          </a>
+                                            </a>
                                         </li>
                                         <li>
                                             <div class="dropdown-divider"></div>

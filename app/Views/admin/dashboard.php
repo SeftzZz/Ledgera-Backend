@@ -146,7 +146,7 @@
                         <script src="<?= base_url('assets/vendor/libs/@form-validation/auto-focus.js') ?>"></script>
 
                         <!-- Main JS (HANYA SEKALI, PASTIKAN TIDAK DOUBLE DI LAYOUT) -->
-                        <script src="<?= base_url('assets/js/main.js') ?>"></script>
+                        <!-- <script src="<?= base_url('assets/js/main.js') ?>"></script> -->
 
                         <!-- Dummy Events (template) -->
                         <script src="<?= base_url('assets/js/app-calendar-events.js') ?>"></script>

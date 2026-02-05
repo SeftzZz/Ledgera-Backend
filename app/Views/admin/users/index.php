@@ -281,7 +281,7 @@
 									              	$name = full['name_user'];
 									            	if ($user_img) {
 									              		// For Avatar image
-									             		var $output = '<img src="' + "../" + $user_img + '" class="rounded-circle">';
+									             		var $output = '<img src="' + "../" + $user_img + '" class="rounded-circleColor">';
 									            	} else {
 									              		// For Avatar badge
 									              		var stateNum = Math.floor(Math.random() * 6);

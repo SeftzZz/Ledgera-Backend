@@ -1,4 +1,3 @@
-// var images = ['https://sbhpaledangmanpwr.fpp/public/assets/themes/login/foto01.jpg', 'https://sbhpaledangmanpwr.fpp/public/assets/themes/login/foto02.jpg', 'https://sbhpaledangmanpwr.fpp/public/assets/themes/login/foto03.jpg'];
 var images = ['assets/login/foto04.jpg', 'assets/login/foto05.jpg'];
 
 $('#container').append('<style>#container, .acceptContainer:before, .logoContainer:before {background: url(' + images[Math.floor(Math.random() * images.length)] + ') center fixed }');

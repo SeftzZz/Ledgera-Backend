@@ -52,10 +52,20 @@ class Users extends BaseAdminController
             'user fnbp'  => 'hotel_fnb_production',
         ];
 
+        // ROLE FILTER
+        $userRole = session()->get('user_role');
+        $hotelId = session()->get('hotel_id');
+
         // QUERY FILTERED (COUNT)
         $countQuery = $this->userModel
             ->join('hotels', 'hotels.id = users.hotel_id', 'left')
             ->where('users.deleted_at', null);
+
+        if ($userRole === 'hotel_hr') {
+            $countQuery
+                ->where('users.hotel_id', $hotelId)
+                ->where('users.role !=', 'worker');
+        }
 
         if ($searchValue) {
             $keyword = strtolower(trim($searchValue));
@@ -75,20 +85,30 @@ class Users extends BaseAdminController
 
         $recordsFiltered = $countQuery->countAllResults();
 
-        // =============================
         // QUERY TOTAL
-        // =============================
-        $recordsTotal = $this->userModel
-            ->where('deleted_at', null)
-            ->countAllResults();
+        $totalQuery = $this->userModel
+            ->join('hotels', 'hotels.id = users.hotel_id', 'left')
+            ->where('users.deleted_at', null);
 
-        // =============================
+        if ($userRole === 'hotel_hr') {
+            $totalQuery
+                ->where('users.hotel_id', $hotelId)
+                ->where('users.role !=', 'worker');
+        }
+        
+        $recordsTotal = $totalQuery->countAllResults();
+
         // QUERY DATA (NEW BUILDER!)
-        // =============================
         $dataQuery = $this->userModel
             ->select('users.*, hotels.hotel_name')
             ->join('hotels', 'hotels.id = users.hotel_id', 'left')
             ->where('users.deleted_at', null);
+
+        if ($userRole === 'hotel_hr') {
+            $dataQuery
+                ->where('users.hotel_id', $hotelId)
+                ->where('users.role !=', 'worker');
+        }
 
         if ($searchValue) {
             $keyword = strtolower(trim($searchValue));
@@ -137,9 +157,9 @@ class Users extends BaseAdminController
 
             $status = strtolower($row['is_active']);
             $badgeStatus = match ($status) {
-                'active'   => '<span class="badge bg-success">Active</span>',
-                'inactive' => '<span class="badge bg-danger">Inactive</span>',
-                default    => '<span class="badge bg-secondary">' . ucfirst(esc($status)) . '</span>',
+                'active'   => '<span class="badge bg-label-success">Active</span>',
+                'inactive' => '<span class="badge bg-label-danger">Inactive</span>',
+                default    => '<span class="badge bg-label-secondary">' . ucfirst(esc($status)) . '</span>',
             };
 
             $result[] = [

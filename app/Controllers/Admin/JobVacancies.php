@@ -145,7 +145,7 @@ class JobVacancies extends BaseAdminController
     {
         $data = $this->request->getPost();
 
-        // basic validation
+        // VALIDASI TIME
         if (strtotime($data['end_time']) <= strtotime($data['start_time'])) {
             return $this->response->setJSON([
                 'status'  => false,
@@ -153,29 +153,48 @@ class JobVacancies extends BaseAdminController
             ]);
         }
 
-        $insert = [
-            'hotel_id'          => session()->get('hotel_id') ?? 1, // sesuaikan role
-            'position'          => $data['position'],
-            'category'          => $data['category'],
-            'job_date_start'    => $data['job_date_start'],
-            'job_date_end'      => $data['job_date_end'],
-            'start_time'        => $data['start_time'],
-            'end_time'          => $data['end_time'],
-            'location'          => $data['location'],
-            'fee'               => $data['fee'],
-            'description'       => $data['description'] ?? null,
-            'requirement_skill' => $data['requirement_skill'] ?? null,
-            'status'            => 'open',
-            'created_at'        => date('Y-m-d H:i:s'),
-            'created_by'        => session()->get('user_id')
-        ];
+        // VALIDASI POSITION (MULTI SELECT)
+        if (empty($data['position']) || !is_array($data['position'])) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'Please select at least one job position'
+            ]);
+        }
 
         $db = \Config\Database::connect();
-        $db->table('jobs')->insert($insert);
+        $builder = $db->table('jobs');
+
+        $now = date('Y-m-d H:i:s');
+        $userId = session()->get('user_id');
+        $hotelId = session()->get('hotel_id');
+
+        foreach ($data['position'] as $position) {
+
+            if (!$position) continue; // skip kosong
+
+            $insert = [
+                'hotel_id'          => $hotelId,
+                'position'          => $position, // 🔥 1 posisi = 1 row
+                'category'          => $data['category'],
+                'job_date_start'    => $data['job_date_start'],
+                'job_date_end'      => $data['job_date_end'],
+                'start_time'        => $data['start_time'],
+                'end_time'          => $data['end_time'],
+                'location'          => $data['location'],
+                'fee'               => $data['fee'],
+                'description'       => $data['description'] ?? null,
+                'requirement_skill' => $data['requirement_skill'] ?? null,
+                'status'            => 'open',
+                'created_at'        => $now,
+                'created_by'        => $userId
+            ];
+
+            $builder->insert($insert);
+        }
 
         return $this->response->setJSON([
             'status'  => true,
-            'message' => 'Job has been successfully created'
+            'message' => 'Job(s) have been successfully created'
         ]);
     }
 

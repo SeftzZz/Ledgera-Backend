@@ -40,13 +40,16 @@
 
                                             <!-- JOB POSITION -->
                                             <div class="col-md-6 mb-3">
-                                              <label class="form-label">Job Position</label>
-                                              <select
-                                                class="form-select select2-job-position"
-                                                name="position"
-                                                style="width:100%"
-                                                required>
-                                              </select>
+                                                <label class="form-label">Job Position</label>
+                                                <select
+                                                    name="position[]"
+                                                    id="add_job_position"
+                                                    class="form-select select2"
+                                                    data-placeholder="Select Job Position"
+                                                    style="width:100%"
+                                                    multiple
+                                                    required>
+                                                </select>
                                             </div>
 
                                             <!-- CATEGORY -->
@@ -152,9 +155,9 @@
                         <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') ?>" />
                         <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css') ?>" />
                         <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css') ?>" />
-                        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/select2/select2.css') ?>">
-
                         <script src="<?= base_url('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') ?>"></script>
+                        <!-- select2 -->
+                        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/select2/select2.css') ?>" />
                         <script src="<?= base_url('assets/vendor/libs/select2/select2.js') ?>"></script>
 
                         <script>
@@ -348,44 +351,44 @@
                         </script>
 
                         <script>
-                            $(function () {
+                            $(document).ready(function () {
 
-                                function initJobPositionSelect2() {
-                                    $('.select2-job-position').select2({
-                                        dropdownParent: $('#modalAddJob'),
-                                        theme: 'bootstrap-5',
-                                        placeholder: 'Select job position',
+                                function initJobPositionSelect2(selector, modal) {
+
+                                    if ($(selector).hasClass('select2-hidden-accessible')) {
+                                        $(selector).select2('destroy');
+                                    }
+
+                                    $(selector).select2({
+                                        placeholder: 'Select Job Position',
                                         allowClear: true,
+                                        closeOnSelect: false, // 🔥 penting untuk multi select
+                                        dropdownParent: modal,
                                         ajax: {
                                             url: "<?= base_url('admin/job-vacancies/skills') ?>",
                                             dataType: 'json',
                                             delay: 250,
                                             data: function (params) {
-                                                return {
-                                                    q: params.term
-                                                };
+                                                return { q: params.term };
                                             },
                                             processResults: function (data) {
-                                                return {
-                                                    results: data.results
-                                                };
+                                                return { results: data.results };
                                             },
                                             cache: true
                                         }
                                     });
                                 }
 
-                                // init saat modal dibuka
                                 $('#modalAddJob').on('shown.bs.modal', function () {
-                                    initJobPositionSelect2();
+                                    initJobPositionSelect2('#add_job_position', $(this));
                                 });
 
-                                // reset select2 saat modal ditutup
                                 $('#modalAddJob').on('hidden.bs.modal', function () {
-                                    $('.select2-job-position').val(null).trigger('change');
+                                    $('#add_job_position').val(null).trigger('change');
                                 });
 
                             });
                         </script>
+
 
                         <?= $this->endSection() ?>

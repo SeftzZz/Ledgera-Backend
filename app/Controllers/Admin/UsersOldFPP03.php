@@ -223,7 +223,7 @@ class Users extends BaseAdminController
 
         $data = [
             'name'       => $this->request->getPost('name_user'),
-            'hotel_id'   => $hotelId,
+            'hotel_id'   => $this->request->getPost('hotel_user'),
             'email'      => $this->request->getPost('email_user'),
             'phone'      => $this->request->getPost('hp_user'),
             'role'       => $this->request->getPost('role_user'),
@@ -287,15 +287,9 @@ class Users extends BaseAdminController
             ]);
         }
 
-        $sessionRole = session()->get('user_role');
-        $hotelId = $this->request->getPost('hotel_id');
-        if ($sessionRole === 'hotel_hr') {
-            $hotelId = session()->get('hotel_id');
-        }
-
         $data = [
             'name'       => $this->request->getPost('name_user'),
-            'hotel_id'   => $hotelId,
+            'hotel_id'   => $this->request->getPost('hotel_user'),
             'role'       => $this->request->getPost('role_user'),
             'phone'      => $this->request->getPost('hp_user'),
             'is_active'  => $this->request->getPost('status_user'),

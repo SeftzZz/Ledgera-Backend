@@ -145,7 +145,8 @@ class Hotels extends BaseAdminController
             'longitude'  => $this->request->getPost('longitude'),
             'website'    => $this->request->getPost('website'),
             'description'=> $this->request->getPost('desc'),
-            'created_by' => session()->get('user_id')
+            'created_by' => session()->get('user_id'),
+            'updated_by' => session()->get('user_id')
         ];
 
         $file = $this->request->getFile('logo');

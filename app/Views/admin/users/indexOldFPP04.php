@@ -406,7 +406,7 @@
 						    });
 
 							$(document).ready(function () {
-							    const sessionRole = "<?= session()->get('user_role') ?>";
+							    const sessionRole  = "<?= session()->get('user_role') ?>";
 							    const sessionHotel = "<?= session()->get('hotel_id') ?>";
 
 							    // INIT SELECT2 
@@ -421,41 +421,13 @@
 							        });
 							    }
 
-							    const allowedRolesHR = [
-							        'hotel_hr',
-							        'hotel_fo',
-							        'hotel_hk',
-							        'hotel_fnb_service',
-							        'hotel_fnb_production'
-							    ];
-
-							    // reset dulu
-							    function filterRoleOptions(selectEl) {
-							        $(selectEl).find('option').show();
-							        if (sessionRole !== 'hotel_hr') return;
-							        $(selectEl).find('option').each(function () {
-							            const val = $(this).val();
-							            if (val && !allowedRolesHR.includes(val)) {
-							                $(this).hide();
-							            }
-							        });
-
-							        // jika role sekarang tidak valid → reset
-							        const current = $(selectEl).val();
-							        if (current && !allowedRolesHR.includes(current)) {
-							            $(selectEl).val('');
-							        }
-							    }
-
 							    $('#modalAddUser').on('shown.bs.modal', function () {
 							        initHotelSelect2('#add_hotel_user', $(this));
 							        if (sessionRole === 'hotel_hr') lockAddHotel();
-							        filterRoleOptions('#modalAddUser select[name="role_user"]');
 							    });
 
 							    $('#modalEditUser').on('shown.bs.modal', function () {
 							        initHotelSelect2('#edit_hotel_user', $(this));
-							        filterRoleOptions('#edit_role_user');
 							    });
 
 							    // Auto Set Hotel Add User

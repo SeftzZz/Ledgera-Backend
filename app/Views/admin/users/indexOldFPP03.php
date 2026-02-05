@@ -133,21 +133,18 @@
 									                        <div class="col-md-6 mb-3">
 									                            <label class="form-label" for="edit_hotel_user">Hotel</label>
 									                        	<select
-																    name="hotel_id"
-																    id="edit_hotel_user"
-																    class="form-select select2"
-																    data-placeholder="Select Hotel"
-																    style="width:100%">
-																    <option value=""></option>
-																    <?php foreach ($hotels as $hotel): ?>
-																        <option value="<?= $hotel['id'] ?>">
-																            <?= esc($hotel['hotel_name']) ?>
-																        </option>
-																    <?php endforeach; ?>
-																</select>
-																<small id="hotelHelpEdit" class="text-muted d-none">
-																    Hotel otomatis mengikuti account HR
-																</small>
+															        name="hotel_user"
+															        id="edit_hotel_user"
+															        class="form-select select2"
+															        data-placeholder="Select Hotel"
+															        style="width:100%">
+															        <option value=""></option>
+															        <?php foreach ($hotels as $hotel): ?>
+															            <option value="<?= $hotel['id'] ?>">
+															                <?= esc($hotel['hotel_name']) ?>
+															            </option>
+															        <?php endforeach; ?>
+															    </select>
 									                        </div>
 									                    </div>
 									                    <div class="row">
@@ -405,15 +402,13 @@
 						        }
 						    });
 
+							// init select2
 							$(document).ready(function () {
-							    const sessionRole = "<?= session()->get('user_role') ?>";
-							    const sessionHotel = "<?= session()->get('hotel_id') ?>";
-
-							    // INIT SELECT2 
 							    function initHotelSelect2(selector, modal) {
 							        if ($(selector).hasClass('select2-hidden-accessible')) {
 							            $(selector).select2('destroy');
 							        }
+
 							        $(selector).select2({
 							            placeholder: 'Select Hotel',
 							            allowClear: true,
@@ -421,121 +416,53 @@
 							        });
 							    }
 
-							    const allowedRolesHR = [
-							        'hotel_hr',
-							        'hotel_fo',
-							        'hotel_hk',
-							        'hotel_fnb_service',
-							        'hotel_fnb_production'
-							    ];
-
-							    // reset dulu
-							    function filterRoleOptions(selectEl) {
-							        $(selectEl).find('option').show();
-							        if (sessionRole !== 'hotel_hr') return;
-							        $(selectEl).find('option').each(function () {
-							            const val = $(this).val();
-							            if (val && !allowedRolesHR.includes(val)) {
-							                $(this).hide();
-							            }
-							        });
-
-							        // jika role sekarang tidak valid → reset
-							        const current = $(selectEl).val();
-							        if (current && !allowedRolesHR.includes(current)) {
-							            $(selectEl).val('');
-							        }
-							    }
+							    $('#modalEditUser').on('shown.bs.modal', function () {
+							        initHotelSelect2('#edit_hotel_user', $('#modalEditUser'));
+							    });
 
 							    $('#modalAddUser').on('shown.bs.modal', function () {
-							        initHotelSelect2('#add_hotel_user', $(this));
-							        if (sessionRole === 'hotel_hr') lockAddHotel();
-							        filterRoleOptions('#modalAddUser select[name="role_user"]');
+							        initHotelSelect2('#add_hotel_user', $('#modalAddUser'));
 							    });
+							});
 
-							    $('#modalEditUser').on('shown.bs.modal', function () {
-							        initHotelSelect2('#edit_hotel_user', $(this));
-							        filterRoleOptions('#edit_role_user');
-							    });
-
-							    // Auto Set Hotel Add User
-							    function lockAddHotel() {
+							// Auto Set Hotel by role
+							$(document).ready(function () {
+							    const sessionRole  = "<?= session()->get('user_role') ?>";
+							    const sessionHotel = "<?= session()->get('hotel_id') ?>";
+							    function lockHotelSelect() {
+							        // set value
 							        $('#add_hotel_user')
 							            .val(sessionHotel)
-							            .trigger('change')
-							            .on('select2:opening select2:selecting', e => e.preventDefault());
+							            .trigger('change');
+
+							        // lock interaction (tanpa disabled)
+							        $('#add_hotel_user').on('select2:opening select2:selecting', function (e) {
+							            e.preventDefault();
+							        });
 							    }
-
-							    function unlockAddHotel() {
-							        $('#add_hotel_user')
-							            .off('select2:opening select2:selecting');
+							    function unlockHotelSelect() {
+							        $('#add_hotel_user').off('select2:opening select2:selecting');
+							        $('#add_hotel_user').val(null).trigger('change');
 							    }
-
-							    $('#modalAddUser select[name="role_user"]').on('change', function () {
-								    if (sessionRole === 'hotel_hr') {
-								        lockAddHotel();
-								        return;
-								    }
-								    unlockAddHotel();
-								});
-
-							    // Auto Set Hotel Edit User
-							    function lockEditHotel() {
-							        $('#edit_hotel_user')
-							            .val(sessionHotel)
-							            .trigger('change')
-							            .on('select2:opening select2:selecting', e => e.preventDefault());
-
-							        $('#hotelHelpEdit').removeClass('d-none');
-							    }
-
-							    function unlockEditHotel() {
-							        $('#edit_hotel_user')
-							            .off('select2:opening select2:selecting');
-
-							        $('#hotelHelpEdit').addClass('d-none');
-							    }
-
-							    $(document).on('click', '.btn-edit', function () {
-							        const id = $(this).data('id');
-							        $.post("<?= base_url('admin/users/get') ?>", {
-							            id: id,
-							            '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
-							        }, function (res) {
-
-							            if (!res.status) {
-							                Swal.fire('Error', res.message, 'error');
-							                return;
-							            }
-
-							            const d = res.data;
-
-							            $('#edit_id').val(d.id);
-							            $('#edit_name_user').val(d.name);
-							            $('#edit_role_user').val(d.role);
-							            $('#edit_hp_user').val(d.phone);
-							            $('#edit_status_user').val(d.is_active);
-							            $('#edit_hotel_user').val(d.hotel_id).trigger('change');
-
-							            if (d.photo) {
-							                $('#preview_foto').attr('src', "<?= base_url() ?>" + d.photo).show();
+							    // role change handler
+							    $('select[name="role_user"]').on('change', function () {
+							        const role = $(this).val();
+							        if (sessionRole === 'hotel_hr') {
+							            lockHotelSelect();
+							        } else {
+							            // optional: role tertentu auto hotel
+							            if (role.startsWith('hotel_')) {
+							                unlockHotelSelect();
 							            } else {
-							                $('#preview_foto').hide();
+							                unlockHotelSelect();
 							            }
-
-							            sessionRole === 'hotel_hr'
-							                ? lockEditHotel()
-							                : unlockEditHotel();
-
-							            $('#modalEditUser').modal('show');
-							        }, 'json');
+							        }
 							    });
 
-							    // PREVIEW FOTO
-							    $('#edit_foto').on('change', function () {
-							        const file = this.files[0];
-							        if (file) {
-							            $('#preview_foto').attr('src', URL.createObjectURL(file));
+							    // saat modal add dibuka
+							    $('#modalAddUser').on('shown.bs.modal', function () {
+							        if (sessionRole === 'hotel_hr') {
+							            lockHotelSelect();
 							        }
 							    });
 
@@ -583,7 +510,42 @@
 							    });
 							});
 
-							// Submit form edit data
+							// Edit form
+							$(document).on('click', '.btn-edit', function () {
+							    const id = $(this).data('id');
+							    $('#edit_foto').on('change', function () {
+								    const file = this.files[0];
+								    if (file) {
+								        $('#preview_foto').attr('src', URL.createObjectURL(file));
+								    }
+								});
+							    $.post("<?= base_url('admin/users/get') ?>", {
+							        id: id,
+							        '<?= csrf_token() ?>': '<?= csrf_hash() ?>'
+							    }, function (res) {
+							        if (res.status) {
+							            $('#edit_id').val(res.data.id);
+									    $('#edit_name_user').val(res.data.name);
+									    $('#edit_role_user').val(res.data.role);
+									    $('#edit_hp_user').val(res.data.phone);
+									    $('#edit_status_user').val(res.data.is_active);
+									    $('#edit_hotel_user')
+									        .val(res.data.hotel_id)
+									        .trigger('change');
+									    if (res.data.photo) {
+									        $('#preview_foto')
+									            .attr('src', "<?= base_url() ?>" + res.data.photo)
+									            .show();
+									    } else {
+									        $('#preview_foto').hide();
+									    }
+									    $('#modalEditUser').modal('show');
+							        } else {
+							            Swal.fire('Gagal', res.message, 'error');
+							        }
+							    }, 'json');
+							});
+
 							$('#formEditUser').on('submit', function (e) {
 							    e.preventDefault();
 							    let formData = new FormData(this);

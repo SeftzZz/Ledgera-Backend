@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Models\UserModel;
+use App\Models\HotelModel;
 
 class Users extends BaseAdminController
 {
@@ -16,12 +17,17 @@ class Users extends BaseAdminController
         parent::initController($request, $response, $logger);
 
         $this->userModel = new UserModel();
+        $this->hotelModel = new HotelModel();
     }
 
     public function index()
     {
         $data = [
-            'title'  => 'Users'
+            'title'  => 'Users',
+            'hotels' => $this->hotelModel
+                ->where('deleted_at', null)
+                ->orderBy('hotel_name', 'ASC')
+                ->findAll()
         ];
 
         return view('admin/users/index', $data);
@@ -95,7 +101,7 @@ class Users extends BaseAdminController
                 ->where('users.hotel_id', $hotelId)
                 ->where('users.role !=', 'worker');
         }
-        
+
         $recordsTotal = $totalQuery->countAllResults();
 
         // QUERY DATA (NEW BUILDER!)
@@ -144,6 +150,7 @@ class Users extends BaseAdminController
         $no = $start + 1;
         
         foreach ($data as $row) {
+            // Ganti nama kolom role
             $roleMap = [
                 'admin'                  => 'Admin HW',
                 'worker'                 => 'Mitra',
@@ -155,12 +162,30 @@ class Users extends BaseAdminController
             ];
             $role = $row['role'];
 
+            // bikin badge di kolom status
             $status = strtolower($row['is_active']);
             $badgeStatus = match ($status) {
                 'active'   => '<span class="badge bg-label-success">Active</span>',
                 'inactive' => '<span class="badge bg-label-danger">Inactive</span>',
                 default    => '<span class="badge bg-label-secondary">' . ucfirst(esc($status)) . '</span>',
             };
+
+            // kondisi tombol delete jika session sama dengan id
+            $loginUserId = session()->get('user_id');
+            $actionBtn = '
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-icon btn-primary btn-edit" data-id="'.$row['id'].'" title="Edit">
+                        <i class="ti ti-pencil"></i>
+                    </button>
+            ';
+            if ($loginUserId != $row['id']) {
+                $actionBtn .= '
+                    <button class="btn btn-sm btn-icon btn-danger btn-delete" data-id="'.$row['id'].'" title="Delete">
+                        <i class="ti ti-trash"></i>
+                    </button>
+                ';
+            }
+            $actionBtn .= '</div>';
 
             $result[] = [
                 'no_urut'       => $no++.'.',
@@ -171,16 +196,7 @@ class Users extends BaseAdminController
                 'hp_user'       => esc($row['phone']),
                 'status_user'   => $badgeStatus,
                 'photo_user'    => esc($row['photo']),
-                'action' => '
-                    <div class="d-flex gap-2">
-                        <button class="btn btn-sm btn-icon btn-primary btn-edit" data-id="'.$row['id'].'" title="Edit">
-                            <i class="ti ti-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-icon btn-danger btn-delete" data-id="'.$row['id'].'" title="Delete">
-                            <i class="ti ti-trash"></i>
-                        </button>
-                    </div>
-                '
+                'action'        => $actionBtn
             ];
         }
 
@@ -232,9 +248,9 @@ class Users extends BaseAdminController
 
         $id = $this->request->getPost('id');
 
-        $hotel = $this->hotelModel->find($id);
+        $user = $this->userModel->find($id);
 
-        if (!$hotel) {
+        if (!$user) {
             return $this->response->setJSON([
                 'status' => false,
                 'message' => 'Data tidak ditemukan'
@@ -243,7 +259,7 @@ class Users extends BaseAdminController
 
         return $this->response->setJSON([
             'status' => true,
-            'data'   => $hotel
+            'data'   => $user
         ]);
     }
 
@@ -254,9 +270,9 @@ class Users extends BaseAdminController
         }
 
         $id = $this->request->getPost('id');
-        $hotel = $this->hotelModel->find($id);
+        $user = $this->userModel->find($id);
 
-        if (!$hotel) {
+        if (!$user) {
             return $this->response->setJSON([
                 'status' => false,
                 'message' => 'Data tidak ditemukan'
@@ -264,17 +280,24 @@ class Users extends BaseAdminController
         }
 
         $data = [
-            'hotel_name' => $this->request->getPost('hotel_name'),
-            'location'   => $this->request->getPost('location'),
-            'latitude'   => $this->request->getPost('latitude'),
-            'longitude'  => $this->request->getPost('longitude'),
-            'website'    => $this->request->getPost('website'),
-            'description'=> $this->request->getPost('desc'),
+            'name'       => $this->request->getPost('name_user'),
+            'hotel_id'   => $this->request->getPost('hotel_user'),
+            'role'       => $this->request->getPost('role_user'),
+            'phone'      => $this->request->getPost('hp_user'),
+            'is_active'  => $this->request->getPost('status_user'),
             'updated_by' => session()->get('user_id')
         ];
 
+        // GANTI PASS
+        if ($this->request->getPost('pass_user')) {
+            $data['password'] = password_hash(
+                $this->request->getPost('pass_user'),
+                PASSWORD_DEFAULT
+            );
+        }
+
         // UPLOAD LOGO
-        $file = $this->request->getFile('logo');
+        $file = $this->request->getFile('foto');
         if ($file && $file->getError() !== UPLOAD_ERR_NO_FILE) {
             // VALIDASI FILE
             if (! $file->isValid() || ! in_array($file->getMimeType(), [
@@ -284,23 +307,23 @@ class Users extends BaseAdminController
             ])) {
                 return $this->response->setJSON([
                     'status'  => false,
-                    'message' => 'Logo format must be PNG, JPG or WEBP'
+                    'message' => 'Photo format must be PNG, JPG or WEBP'
                 ]);
             }
             // UPLOAD FILE
             $newName = $file->getRandomName();
             $file->move(FCPATH . 'images', $newName);
 
-            // HAPUS LOGO LAMA
+            // HAPUS FOTO LAMA
             if (!empty($hotel['logo']) && file_exists(FCPATH . $hotel['logo'])) {
                 unlink(FCPATH . $hotel['logo']);
             }
 
-            // SIMPAN PATH
-            $data['logo'] = 'images/' . $newName;
+            // SIMPAN DENGAN PATH
+            $data['logo'] = 'uploads/profiles/' . $newName;
         }
 
-        if ($this->hotelModel->update($id, $data)) {
+        if ($this->userModel->update($id, $data)) {
             return $this->response->setJSON([
                 'status'  => true,
                 'message' => 'Data updated successfully'
@@ -336,7 +359,7 @@ class Users extends BaseAdminController
             'deleted_by'  => session()->get('user_id')
         ];
 
-        $deleted = $this->hotelModel->update($id, $data); // SOFT DELETE
+        $deleted = $this->userModel->update($id, $data); // SOFT DELETE
 
         if ($deleted) {
             return $this->response->setJSON([

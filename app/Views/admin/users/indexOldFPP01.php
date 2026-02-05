@@ -40,19 +40,7 @@
 									                        </div>
 									                        <div class="col-md-6 mb-3">
 									                            <label class="form-label" for="edit_hotel_user">Hotel</label>
-									                        	<select
-															        name="hotel_user"
-															        id="edit_hotel_user"
-															        class="form-select select2"
-															        data-placeholder="Select Hotel"
-															        style="width:100%">
-															        <option value=""></option>
-															        <?php foreach ($hotels as $hotel): ?>
-															            <option value="<?= $hotel['id'] ?>">
-															                <?= esc($hotel['hotel_name']) ?>
-															            </option>
-															        <?php endforeach; ?>
-															    </select>
+									                        	<input type="text" class="form-control" name="hotel_user" id="edit_hotel_user" required>
 									                        </div>
 									                    </div>
 									                    <div class="row">
@@ -70,31 +58,17 @@
 									                        </div>
 									                        <div class="col-md-6 mb-3">
 									                            <label class="form-label" for="edit_role_user">Role</label>
-									                            <select name="role_user" id="edit_role_user" class="form-control required">
-								                                    <option value="admin">Admin HW</option>
-								                                    <option value="worker">Mitra</option>
-								                                    <option value="hotel_hr">User HR</option>
-								                                    <option value="hotel_fo">User FO</option>
-								                                    <option value="hotel_hk">User HK</option>
-								                                    <option value="hotel_fnb_service">User FnBS</option>
-								                                    <option value="hotel_fnb_production">User FnBP</option>
-								                                </select>
+											            		<input type="text" class="form-control" name="role_user" id="edit_role_user" required>
 									                        </div>
 									                    </div>
 									                    <div class="row">
 									                        <div class="col-md-6 mb-3">
 									                            <label class="form-label" for="edit_status_user">Status</label>
-									                            <select name="status_user" id="edit_status_user" class="form-control required">
-								                                    <option value="active">Active</option>
-								                                    <option value="inactive">Inactive</option>
-								                                </select>
+									                        	<input type="text" class="form-control" name="status_user" id="edit_status_user" required>
 									                        </div>
 									                        <div class="col-md-6 mb-3">
 									                            <label class="form-label" for="edit_pass_user">Password</label>
-											            		<input type="text" class="form-control" name="pass_user" id="edit_pass_user">
-											            		<small class="text-muted">
-															        Leave blank if you don't want to change
-															    </small>
+											            		<input type="text" class="form-control" name="pass_user" id="edit_pass_user" required>
 									                        </div>
 									                    </div>
 									                    <div class="mb-3">
@@ -128,9 +102,7 @@
 				        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css') ?>" />
 				        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.css') ?>" />
 		                <script src="<?= base_url('assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') ?>"></script>
-		                <!-- select2 -->
-		                <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/select2/select2.css') ?>" />
-		                <script src="<?= base_url('assets/vendor/libs/select2/select2.js') ?>"></script>
+		              
 
 		                <script>
 						    // DataTables Users
@@ -310,25 +282,6 @@
 						        }
 						    });
 
-							// init select2
-							$(document).ready(function () {
-							    function initHotelSelect2() {
-							        $('#edit_hotel_user').select2({
-							            placeholder: 'Select Hotel',
-							            allowClear: true,
-							            dropdownParent: $('#modalEditUser')
-							        });
-							    }
-
-							    // destroy dulu agar tidak double init
-							    $('#modalEditUser').on('shown.bs.modal', function () {
-							        if ($('#edit_hotel_user').hasClass("select2-hidden-accessible")) {
-							            $('#edit_hotel_user').select2('destroy');
-							        }
-							        initHotelSelect2();
-							    });
-							});
-
 							// Edit form
 							$(document).on('click', '.btn-edit', function () {
 							    const id = $(this).data('id');
@@ -344,22 +297,23 @@
 							    }, function (res) {
 							        if (res.status) {
 							            $('#edit_id').val(res.data.id);
-									    $('#edit_name_user').val(res.data.name);
-									    $('#edit_role_user').val(res.data.role);
-									    $('#edit_hp_user').val(res.data.phone);
-									    $('#edit_status_user').val(res.data.is_active);
-									    $('#edit_hotel_user')
-									        .val(res.data.hotel_id)
-									        .trigger('change');
+							            $('#edit_name_user').val(res.data.name);
+							            $('#edit_hotel_user').val(res.data.hotel_id);
+							            $('#edit_role_user').val(res.data.role);
+							            $('#edit_hp_user').val(res.data.phone);
+							            $('#edit_status_user').val(res.data.is_active);
+							            if (res.data.logo) {
+										  	$('#preview_foto')
+										    .attr('src', "<?= base_url() ?>" + res.data.photo)
+										    .show();
+										} else {
+										  	$('#preview_foto')
+										    .removeAttr('src')
+										    .hide();
+										}
+										$('#edit_foto').val('');
 
-									    if (res.data.photo) {
-									        $('#preview_foto')
-									            .attr('src', "<?= base_url() ?>" + res.data.photo)
-									            .show();
-									    } else {
-									        $('#preview_foto').hide();
-									    }
-									    $('#modalEditUser').modal('show');
+							            $('#modalEditUser').modal('show');
 							        } else {
 							            Swal.fire('Gagal', res.message, 'error');
 							        }

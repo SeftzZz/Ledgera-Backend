@@ -145,7 +145,30 @@ class JobVacancies extends BaseAdminController
     {
         $data = $this->request->getPost();
 
+        // =========================
+        // VALIDASI & KONVERSI DATE
+        // =========================
+        try {
+            $jobDateStart = \DateTime::createFromFormat('d-m-Y', $data['job_date_start']);
+            $jobDateEnd   = \DateTime::createFromFormat('d-m-Y', $data['job_date_end']);
+
+            if (!$jobDateStart || !$jobDateEnd) {
+                throw new \Exception('Invalid date format');
+            }
+
+            $jobDateStart = $jobDateStart->format('Y-m-d');
+            $jobDateEnd   = $jobDateEnd->format('Y-m-d');
+
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'status'  => false,
+                'message' => 'Invalid job date format'
+            ]);
+        }
+
+        // =========================
         // VALIDASI TIME
+        // =========================
         if (strtotime($data['end_time']) <= strtotime($data['start_time'])) {
             return $this->response->setJSON([
                 'status'  => false,
@@ -153,7 +176,9 @@ class JobVacancies extends BaseAdminController
             ]);
         }
 
-        // VALIDASI POSITION (MULTI SELECT)
+        // =========================
+        // VALIDASI POSITION (MULTI)
+        // =========================
         if (empty($data['position']) || !is_array($data['position'])) {
             return $this->response->setJSON([
                 'status'  => false,
@@ -164,26 +189,24 @@ class JobVacancies extends BaseAdminController
         $db = \Config\Database::connect();
         $builder = $db->table('jobs');
 
-        $now = date('Y-m-d H:i:s');
+        $now     = date('Y-m-d H:i:s');
         $userId = session()->get('user_id');
         $hotelId = session()->get('hotel_id');
 
         foreach ($data['position'] as $position) {
 
-            if (!$position) continue; // skip kosong
+            if (!$position) continue;
 
             $insert = [
                 'hotel_id'          => $hotelId,
-                'position'          => $position, // 🔥 1 posisi = 1 row
+                'position'          => $position, // 1 posisi = 1 row
                 'category'          => $data['category'],
-                'job_date_start'    => $data['job_date_start'],
-                'job_date_end'      => $data['job_date_end'],
+                'job_date_start'    => $jobDateStart, // ✅ yyyy-mm-dd
+                'job_date_end'      => $jobDateEnd,   // ✅ yyyy-mm-dd
                 'start_time'        => $data['start_time'],
                 'end_time'          => $data['end_time'],
-                'location'          => $data['location'],
                 'fee'               => $data['fee'],
                 'description'       => $data['description'] ?? null,
-                'requirement_skill' => $data['requirement_skill'] ?? null,
                 'status'            => 'open',
                 'created_at'        => $now,
                 'created_by'        => $userId

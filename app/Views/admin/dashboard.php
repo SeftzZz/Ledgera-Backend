@@ -1,5 +1,19 @@
                         <?= $this->extend('layouts/main') ?>
                         <?= $this->section('content') ?>
+                            <style>
+                            /* tanggal sebelum hari ini */
+                            .fc-day-past {
+                              background-color: #f5f5f5;
+                              cursor: not-allowed;
+                              opacity: 0.6;
+                            }
+
+                            /* cegah hover */
+                            .fc-day-past:hover {
+                              background-color: #f5f5f5;
+                            }
+                            </style>
+
                             <div class="container-xxl flex-grow-1 container-p-y">
                               <div class="card app-calendar-wrapper">
                                 <div class="row g-0">
@@ -115,7 +129,126 @@
 
 
                                       </div>
+                                    </div>
+                                    <div class="modal fade" id="modalAddJob" tabindex="-1" aria-hidden="true">
+                                      <div class="modal-dialog modal-lg modal-dialog-centered">
+                                        <div class="modal-content">
 
+                                          <form id="formAddJob">
+                                            <?= csrf_field() ?>
+
+                                            <div class="modal-header">
+                                              <h5 class="modal-title">Add New Job</h5>
+                                              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+
+                                            <div class="modal-body">
+                                              <div class="row">
+
+                                                <!-- JOB POSITION -->
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Job Position</label>
+                                                    <select
+                                                        name="position[]"
+                                                        id="add_job_position"
+                                                        class="form-select select2"
+                                                        data-placeholder="Select Job Position"
+                                                        style="width:100%"
+                                                        multiple
+                                                        required>
+                                                    </select>
+                                                </div>
+
+                                                <!-- CATEGORY -->
+                                                <div class="col-md-6 mb-3">
+                                                  <label class="form-label">Category</label>
+                                                  <select class="form-select" name="category" required>
+                                                    <option value="">-- Select Category --</option>
+                                                    <option value="daily_worker">Daily Worker</option>
+                                                    <option value="casual">Casual</option>
+                                                  </select>
+                                                </div>
+
+                                              </div>
+
+                                              <div class="row">
+
+                                                <!-- START DATE -->
+                                                <div class="col-md-6 mb-3">
+                                                  <label class="form-label">Job Start Date</label>
+                                                  <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    name="job_date_start"
+                                                    id="job_date_start"
+                                                    placeholder="dd-mm-yyyy"
+                                                    required>
+                                                </div>
+
+                                                <!-- END DATE -->
+                                                <div class="col-md-6 mb-3">
+                                                  <label class="form-label">Job End Date</label>
+                                                  <input
+                                                    type="text"
+                                                    class="form-control"
+                                                    name="job_date_end"
+                                                    id="job_date_end"
+                                                    placeholder="dd-mm-yyyy"
+                                                    required>
+                                                </div>
+
+                                              </div>
+
+                                              <div class="row">
+
+                                                <!-- START TIME -->
+                                                <div class="col-md-6 mb-3">
+                                                  <label class="form-label">Start Time</label>
+                                                  <input type="time" class="form-control" name="start_time" required>
+                                                </div>
+
+                                                <!-- END TIME -->
+                                                <div class="col-md-6 mb-3">
+                                                  <label class="form-label">End Time</label>
+                                                  <input type="time" class="form-control" name="end_time" required>
+                                                </div>
+
+                                              </div>
+
+                                              <div class="row">
+
+                                                <!-- FEE -->
+                                                <div class="col-md-12 mb-3">
+                                                  <label class="form-label">Fee</label>
+                                                  <input type="number" class="form-control" name="fee" required>
+                                                </div>
+
+                                              </div>
+
+                                              <!-- DESCRIPTION -->
+                                              <div class="mb-3">
+                                                <label class="form-label">Job Description</label>
+                                                <textarea class="form-control" name="description" rows="3"></textarea>
+                                              </div>
+
+                                              <!-- STATUS (hidden, default open) -->
+                                              <input type="hidden" name="status" value="open">
+
+                                            </div>
+
+                                            <div class="modal-footer">
+                                              <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">
+                                                Cancel
+                                              </button>
+                                              <button type="submit" class="btn btn-primary">
+                                                Save & Publish
+                                              </button>
+                                            </div>
+
+                                          </form>
+
+                                        </div>
+                                      </div>
                                     </div>
                                   </div>
                                   <!-- /Calendar & Modal -->
@@ -135,6 +268,7 @@
                         <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/quill/editor.css') ?>" />
                         <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/@form-validation/form-validation.css') ?>" />
                         <link rel="stylesheet" href="<?= base_url('assets/vendor/css/pages/app-calendar.css') ?>" />
+                        <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/toastr/toastr.css') ?>">
 
                         <!-- Vendors JS (WAJIB URUT) -->
                         <script src="<?= base_url('assets/vendor/libs/fullcalendar/fullcalendar.js') ?>"></script>
@@ -144,6 +278,7 @@
                         <script src="<?= base_url('assets/vendor/libs/@form-validation/popular.js') ?>"></script>
                         <script src="<?= base_url('assets/vendor/libs/@form-validation/bootstrap5.js') ?>"></script>
                         <script src="<?= base_url('assets/vendor/libs/@form-validation/auto-focus.js') ?>"></script>
+                        <script src="<?= base_url('assets/vendor/libs/toastr/toastr.js') ?>"></script>
 
                         <!-- Main JS (HANYA SEKALI, PASTIKAN TIDAK DOUBLE DI LAYOUT) -->
                         <!-- <script src="<?= base_url('assets/js/main.js') ?>"></script> -->
@@ -164,79 +299,94 @@
 
                         <script>
                           window.events = [];
-                          window.calendarsColor = {};
+                          window.calendarsColor = {}; // ❗ JANGAN RESET LAGI
+                        </script>
 
-                          fetch('<?= base_url('admin/dashboard/calendar') ?>')
-                            .then(res => res.json())
-                            .then(data => {
+                        <script>
+                          function loadJobCalendar() {
 
-                              // ============================
-                              // 1. Isi events
-                              // ============================
-                              window.events.splice(0, window.events.length, ...data);
+                            fetch('<?= base_url('admin/dashboard/calendar') ?>')
+                              .then(res => res.json())
+                              .then(data => {
 
-                              // ============================
-                              // 2. Posisi unik
-                              // ============================
-                              const positions = [...new Set(
-                                data.map(ev => ev.extendedProps.calendar)
-                              )];
+                                // ============================
+                                // 1. Update events (replace isi)
+                                // ============================
+                                window.events.splice(0, window.events.length, ...data);
 
-                              // ============================
-                              // 3. Warna dinamis
-                              // ============================
-                              const COLORS = ['primary', 'success', 'danger', 'warning', 'info', 'dark'];
-                              positions.forEach((position, index) => {
-                                window.calendarsColor[position] = COLORS[index % COLORS.length];
-                              });
+                                // ============================
+                                // 2. Ambil posisi unik
+                                // ============================
+                                const positions = [...new Set(
+                                  data.map(ev => ev.extendedProps.calendar)
+                                )];
 
-                              // ============================
-                              // 4. Generate filter
-                              // ============================
-                              const container = document.getElementById('jobFilterContainer');
-                              container.innerHTML = '';
+                                // ============================
+                                // 3. ASSIGN WARNA (HANYA JIKA BELUM ADA)
+                                // ============================
+                                let colorIndex = Object.keys(window.calendarsColor).length;
 
-                              positions.forEach(position => {
-                                const value = position.toLowerCase();
-                                const id = 'filter-' + value.replace(/\s+/g, '-');
-                                const color = window.calendarsColor[position];
-
-                                container.insertAdjacentHTML('beforeend', `
-                                  <div class="form-check mb-2">
-                                    <input
-                                      class="form-check-input input-filter"
-                                      type="checkbox"
-                                      id="${id}"
-                                      data-value="${value}"
-                                      checked
-                                    />
-                                    <label class="form-check-label d-flex align-items-center gap-2" for="${id}">
-                                      <span class="badge badge-dot bg-${color}"></span>
-                                      ${position}
-                                    </label>
-                                  </div>
-                                `);
-                              });
-
-                              // ============================
-                              // 🔥 5. LISTENER FILTER REALTIME
-                              // ============================
-                              document.querySelectorAll('.input-filter').forEach(el => {
-                                el.addEventListener('change', () => {
-                                  if (window.calendar) {
-                                    window.calendar.refetchEvents();
+                                positions.forEach(position => {
+                                  if (!window.calendarsColor[position]) {
+                                    window.calendarsColor[position] =
+                                      window.TEMPLATE_COLORS[colorIndex % window.TEMPLATE_COLORS.length];
+                                    colorIndex++;
                                   }
                                 });
-                              });
 
-                              // render pertama
-                              if (window.calendar) {
-                                window.calendar.refetchEvents();
-                              }
-                            })
-                            .catch(err => {
-                              console.error('Failed load job calendar', err);
-                            });
+                                // ============================
+                                // 4. Generate filter (UI)
+                                // ============================
+                                const container = document.getElementById('jobFilterContainer');
+                                container.innerHTML = '';
+
+                                positions.forEach(position => {
+                                  const value = position.toLowerCase();
+                                  const id = 'filter-' + value.replace(/\s+/g, '-');
+                                  const color = window.calendarsColor[position];
+
+                                  container.insertAdjacentHTML('beforeend', `
+                                    <div class="form-check mb-2">
+                                      <input
+                                        class="form-check-input input-filter"
+                                        type="checkbox"
+                                        id="${id}"
+                                        data-value="${value}"
+                                        checked
+                                      />
+                                      <label class="form-check-label d-flex align-items-center gap-2" for="${id}">
+                                        <span class="badge badge-dot bg-${color}"></span>
+                                        ${position}
+                                      </label>
+                                    </div>
+                                  `);
+                                });
+
+                                // ============================
+                                // 5. Filter listener
+                                // ============================
+                                document.querySelectorAll('.input-filter').forEach(el => {
+                                  el.addEventListener('change', () => {
+                                    if (window.calendar) {
+                                      window.calendar.refetchEvents();
+                                    }
+                                  });
+                                });
+
+                                // ============================
+                                // 6. Refresh calendar
+                                // ============================
+                                if (window.calendar) {
+                                  window.calendar.refetchEvents();
+                                }
+                              })
+                              .catch(err => {
+                                console.error('Failed load job calendar', err);
+                              });
+                          }
+
+                          // 🔥 LOAD PERTAMA KALI
+                          document.addEventListener('DOMContentLoaded', loadJobCalendar);
                         </script>
 
                         <!-- App Calendar Logic (template) -->
@@ -380,6 +530,153 @@
                                 offcanvas.show();
                               });
                             }, 100);
+                          });
+                        </script>
+
+                        <script>
+                          document.addEventListener('DOMContentLoaded', function () {
+
+                            const waitCalendar = setInterval(() => {
+
+                              if (!window.calendar) return;
+                              clearInterval(waitCalendar);
+
+                              window.calendar.setOption('dateClick', function (info) {
+
+                                const clickedDate = moment(info.date).startOf('day');
+                                const today = moment().startOf('day');
+
+                                // ❌ blok tanggal kemarin & sebelumnya
+                                if (clickedDate.isBefore(today)) {
+                                  return;
+                                }
+
+                                // ✅ format dd-mm-yyyy (SESUAI INPUT)
+                                const date = clickedDate.format('DD-MM-YYYY');
+                                const modal = $('#modalAddJob');
+
+                                if (!modal.length) return;
+
+                                modal.find('input[name="job_date_start"]').val(date);
+                                modal.find('input[name="job_date_end"]').val(date);
+
+                                modal.modal('show');
+                              });
+
+                            }, 100);
+
+                          });
+                        </script>
+
+                        <script>
+                            $(document).ready(function () {
+
+                                function initJobPositionSelect2(selector, modal) {
+
+                                    if ($(selector).hasClass('select2-hidden-accessible')) {
+                                        $(selector).select2('destroy');
+                                    }
+
+                                    $(selector).select2({
+                                        placeholder: 'Select Job Position',
+                                        allowClear: true,
+                                        closeOnSelect: false, // 🔥 penting untuk multi select
+                                        dropdownParent: modal,
+                                        ajax: {
+                                            url: "<?= base_url('admin/job-vacancies/skills') ?>",
+                                            dataType: 'json',
+                                            delay: 250,
+                                            data: function (params) {
+                                                return { q: params.term };
+                                            },
+                                            processResults: function (data) {
+                                                return { results: data.results };
+                                            },
+                                            cache: true
+                                        }
+                                    });
+                                }
+
+                                $('#modalAddJob').on('shown.bs.modal', function () {
+                                    initJobPositionSelect2('#add_job_position', $(this));
+                                });
+
+                                $('#modalAddJob').on('hidden.bs.modal', function () {
+                                    $('#add_job_position').val(null).trigger('change');
+                                });
+
+                            });
+                        </script>
+
+                        <script>
+                          document.addEventListener('DOMContentLoaded', function () {
+
+                            flatpickr('#job_date_start', {
+                              dateFormat: 'd-m-Y',
+                              allowInput: true,
+                              minDate: 'today'
+                            });
+
+                            flatpickr('#job_date_end', {
+                              dateFormat: 'd-m-Y',
+                              allowInput: true,
+                              minDate: 'today'
+                            });
+
+                          });
+                        </script>
+
+                        <script>
+                          'use strict';
+
+                          $(function () {
+
+                            $('#formAddJob').on('submit', function (e) {
+                              e.preventDefault();
+
+                              let form = $(this);
+                              let btn  = form.find('button[type="submit"]');
+
+                              btn.prop('disabled', true)
+                                 .html('<span class="spinner-border spinner-border-sm"></span> Saving...');
+
+                              $.ajax({
+                                url: "<?= base_url('admin/job-vacancies/store') ?>",
+                                type: "POST",
+                                data: form.serialize(),
+                                dataType: "json",
+
+                                success: function (res) {
+
+                                  if (res.status === true) {
+
+                                    $('#modalAddJob').modal('hide');
+                                    form[0].reset();
+
+                                    // 🔥 RELOAD CALENDAR (WARNA TETAP)
+                                    loadJobCalendar();
+
+                                    toastr.success(res.message ?? 'Job successfully added');
+
+                                  } else {
+                                    toastr.error(res.message ?? 'Failed to save job');
+                                  }
+                                },
+
+                                error: function (xhr) {
+                                  let msg = 'Server error';
+                                  if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    msg = xhr.responseJSON.message;
+                                  }
+                                  toastr.error(msg);
+                                },
+
+                                complete: function () {
+                                  btn.prop('disabled', false).html('Save Job');
+                                }
+                              });
+                            });
+
                           });
                         </script>
 

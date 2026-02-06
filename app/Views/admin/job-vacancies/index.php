@@ -98,14 +98,8 @@
 
                                           <div class="row">
 
-                                            <!-- LOCATION -->
-                                            <div class="col-md-6 mb-3">
-                                              <label class="form-label">Location</label>
-                                              <input type="text" class="form-control" name="location" required>
-                                            </div>
-
                                             <!-- FEE -->
-                                            <div class="col-md-6 mb-3">
+                                            <div class="col-md-12 mb-3">
                                               <label class="form-label">Fee</label>
                                               <input type="number" class="form-control" name="fee" required>
                                             </div>
@@ -116,12 +110,6 @@
                                           <div class="mb-3">
                                             <label class="form-label">Job Description</label>
                                             <textarea class="form-control" name="description" rows="3"></textarea>
-                                          </div>
-
-                                          <!-- REQUIREMENT -->
-                                          <div class="mb-3">
-                                            <label class="form-label">Requirement Skill</label>
-                                            <textarea class="form-control" name="requirement_skill" rows="3"></textarea>
                                           </div>
 
                                           <!-- STATUS (hidden, default open) -->

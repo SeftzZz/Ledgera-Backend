@@ -270,20 +270,18 @@ document.addEventListener('DOMContentLoaded', function () {
         return ['fc-event-' + colorName];
       },
       dateClick: function (info) {
-        let date = moment(info.date).format('YYYY-MM-DD');
-        resetValues();
-        bsAddEventSidebar.show();
 
-        // For new event set offcanvas title text: Add Event
-        if (offcanvasTitle) {
-          offcanvasTitle.innerHTML = 'Add Event';
-        }
-        btnSubmit.innerHTML = 'Add';
-        btnSubmit.classList.remove('btn-update-event');
-        btnSubmit.classList.add('btn-add-event');
-        btnDeleteEvent.classList.add('d-none');
-        eventStartDate.value = date;
-        eventEndDate.value = date;
+        // ambil tanggal yang diklik
+        let date = moment(info.date).format('YYYY-MM-DD');
+
+        // set default date ke form Add Job
+        const modal = $('#modalAddJob');
+
+        modal.find('input[name="job_date_start"]').val(date);
+        modal.find('input[name="job_date_end"]').val(date);
+
+        // buka modal Add Job
+        modal.modal('show');
       },
       eventClick: function (info) {
         eventClick(info);

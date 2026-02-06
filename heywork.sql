@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 04, 2026 at 06:18 PM
+-- Generation Time: Feb 06, 2026 at 05:39 PM
 -- Server version: 10.11.10-MariaDB-log
 -- PHP Version: 8.3.27
 
@@ -36,7 +36,7 @@ CREATE TABLE `hotels` (
   `website` varchar(50) DEFAULT NULL,
   `description` text NOT NULL,
   `founded` year(4) NOT NULL,
-  `size` int(11) DEFAULT NULL,
+  `size` int(1) DEFAULT NULL,
   `logo` varchar(250) DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `created_by` int(1) NOT NULL,
@@ -89,10 +89,18 @@ INSERT INTO `jobs` (`id`, `hotel_id`, `position`, `job_date_start`, `job_date_en
 (1, 1, 'Room Attendant', '2026-01-19', '2026-01-20', '07:30:00', '17:30:00', 'daily_worker', 100000, 'Bogor West Java', NULL, NULL, 'open', NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 1, 'Public Area', '2026-01-30', '2026-01-31', '07:30:00', '17:30:00', 'casual', 150000, 'Bogor West Java', NULL, NULL, 'open', NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 1, 'Front Office', '2026-02-01', '2026-02-02', '07:30:00', '19:30:00', 'daily_worker', 200000, 'Bogor West Java', '', '', 'open', '2026-01-26 01:35:59', NULL, NULL, NULL, NULL, NULL),
-(4, 1, 'FnB Service', '2026-02-01', '2026-02-02', '07:30:00', '17:30:00', 'daily_worker', 250000, 'Bogor West Java', '', '', 'open', '2026-01-26 01:36:37', NULL, NULL, NULL, NULL, NULL),
-(5, 1, 'FnB Product', '2026-02-01', '2026-02-02', '07:30:00', '17:30:00', 'daily_worker', 300000, 'Bogor West Java', '', '', 'open', '2026-01-26 01:36:47', NULL, NULL, NULL, NULL, NULL),
+(4, 1, 'FnB Service', '2026-02-05', '2026-02-07', '07:30:00', '21:30:00', 'daily_worker', 250000, 'Bogor West Java', '', '', 'open', '2026-01-26 01:36:37', NULL, NULL, NULL, NULL, NULL),
+(5, 1, 'FnB Product', '2026-02-06', '2026-02-06', '07:30:00', '17:30:00', 'daily_worker', 300000, 'Bogor West Java', '', '', 'open', '2026-01-26 01:36:47', NULL, NULL, NULL, NULL, NULL),
 (6, 1, 'Security', '2026-02-01', '2026-02-02', '07:30:00', '17:30:00', 'daily_worker', 350000, 'Bogor West Java', '', '', 'open', '2026-01-26 02:07:23', NULL, NULL, NULL, NULL, NULL),
-(7, 1, 'Marketing', '2026-02-01', '2026-02-02', '07:30:00', '17:30:00', 'daily_worker', 400000, 'Bogor West Java', '', '', 'open', '2026-01-26 02:07:55', NULL, NULL, NULL, NULL, NULL);
+(7, 1, 'Marketing', '2026-02-01', '2026-02-02', '07:30:00', '17:30:00', 'daily_worker', 400000, 'Bogor West Java', '', '', 'open', '2026-01-26 02:07:55', NULL, NULL, NULL, NULL, NULL),
+(8, 1, 'Bellboy', '2026-02-06', '2026-02-06', '07:30:00', '20:30:00', 'daily_worker', 400000, 'Bogor West Java', '', '', 'open', '2026-01-26 02:07:55', NULL, NULL, NULL, NULL, NULL),
+(9, 0, 'Barista', '2026-02-07', '2026-02-14', '07:30:00', '17:30:00', 'daily_worker', 120000, 'Bogor, Jawa Barat', 'Melayani dan memasak untuk tamu hotel', '', 'open', '2026-02-05 20:21:58', 3, NULL, NULL, NULL, NULL),
+(10, 0, 'Bartender', '2026-02-07', '2026-02-14', '07:30:00', '17:30:00', 'daily_worker', 120000, 'Bogor, Jawa Barat', 'Melayani dan memasak untuk tamu hotel', '', 'open', '2026-02-05 20:21:58', 3, NULL, NULL, NULL, NULL),
+(11, 0, 'Cook', '2026-02-07', '2026-02-14', '07:30:00', '17:30:00', 'daily_worker', 120000, 'Bogor, Jawa Barat', 'Melayani dan memasak untuk tamu hotel', '', 'open', '2026-02-05 20:21:58', 3, NULL, NULL, NULL, NULL),
+(12, 0, 'Cook Helper', '2026-02-07', '2026-02-14', '07:30:00', '17:30:00', 'daily_worker', 120000, 'Bogor, Jawa Barat', 'Melayani dan memasak untuk tamu hotel', '', 'open', '2026-02-05 20:21:58', 3, NULL, NULL, NULL, NULL),
+(13, 1, 'Accounting Staff', '2026-02-16', '2026-02-16', '08:00:00', '17:00:00', 'daily_worker', 100000, NULL, 'Okee', NULL, 'open', '2026-02-06 13:59:21', 3, NULL, NULL, NULL, NULL),
+(14, 1, 'Food & Beverage Manager', '2026-02-17', '2026-02-17', '07:00:00', '18:00:00', 'daily_worker', 200000, NULL, 'okeee', NULL, 'open', '2026-02-06 14:10:31', 3, NULL, NULL, NULL, NULL),
+(15, 1, 'Chef de Partie', '2026-02-18', '2026-02-18', '07:00:00', '17:30:00', 'daily_worker', 100000, NULL, 'Okeeee', NULL, 'open', '2026-02-06 14:12:27', 3, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -107,24 +115,26 @@ CREATE TABLE `job_applications` (
   `status` enum('pending','accepted','rejected','completed') DEFAULT 'pending',
   `applied_at` datetime DEFAULT NULL,
   `accepted_at` datetime DEFAULT NULL,
-  `accepted_by` int(1) DEFAULT NULL
+  `accepted_by` int(1) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
 --
 -- Dumping data for table `job_applications`
 --
 
-INSERT INTO `job_applications` (`id`, `job_id`, `user_id`, `status`, `applied_at`, `accepted_at`, `accepted_by`) VALUES
-(1, 1, 3, 'accepted', '2026-01-19 16:53:39', NULL, NULL),
-(2, 2, 3, 'accepted', '2026-01-19 16:53:39', NULL, NULL),
-(3, 3, 3, 'accepted', '2026-01-19 16:53:39', NULL, NULL),
-(4, 4, 3, 'pending', '2026-01-19 16:53:39', NULL, NULL),
-(5, 4, 2, 'pending', '2026-01-19 16:53:39', NULL, NULL),
-(6, 4, 1, 'pending', '2026-01-19 16:53:39', NULL, NULL),
-(7, 3, 2, 'pending', '2026-01-19 16:53:39', NULL, NULL),
-(8, 5, 1, 'pending', '2026-01-19 16:53:39', NULL, NULL),
-(9, 6, 2, 'pending', '2026-01-19 16:53:39', NULL, NULL),
-(11, 7, 3, 'pending', '2026-01-29 10:31:33', NULL, NULL);
+INSERT INTO `job_applications` (`id`, `job_id`, `user_id`, `status`, `applied_at`, `accepted_at`, `accepted_by`, `deleted_at`) VALUES
+(1, 1, 3, 'accepted', '2026-01-19 16:53:39', NULL, NULL, NULL),
+(2, 2, 3, 'rejected', '2026-01-19 16:53:39', NULL, NULL, NULL),
+(3, 3, 3, 'pending', '2026-01-19 16:53:39', NULL, NULL, NULL),
+(4, 4, 3, 'completed', '2026-01-19 16:53:39', '2026-02-05 15:35:18', 3, NULL),
+(5, 4, 2, 'accepted', '2026-01-19 16:53:39', '2026-02-05 15:35:30', 3, NULL),
+(6, 4, 1, 'rejected', '2026-01-19 16:53:39', NULL, NULL, NULL),
+(7, 3, 2, 'pending', '2026-01-19 16:53:39', NULL, NULL, NULL),
+(8, 5, 1, 'accepted', '2026-01-19 16:53:39', NULL, NULL, NULL),
+(9, 6, 2, 'accepted', '2026-01-19 16:53:39', NULL, NULL, NULL),
+(11, 7, 3, 'pending', '2026-01-29 10:31:33', '2026-02-05 15:27:33', 3, NULL),
+(12, 8, 3, 'accepted', '2026-02-05 18:08:33', '2026-02-05 18:09:13', 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -155,10 +165,8 @@ CREATE TABLE `job_attendances` (
 --
 
 INSERT INTO `job_attendances` (`id`, `job_id`, `application_id`, `user_id`, `type`, `latitude`, `longitude`, `photo_path`, `device_info`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
-(1, 2, 2, 3, 'checkin', -6.5944441, 106.7891234, 'uploads/attendance/checkin_1_2_1705654800.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 07:28:45', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
-(2, 2, 2, 3, 'checkout', -6.5944510, 106.7891102, 'uploads/attendance/checkout_1_2_1705689600.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 17:32:10', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
-(3, 3, 3, 3, 'checkin', -6.6015006, 106.7942450, 'uploads/attendance/checkin_3_3_1769945735.jpg', 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36 Edg/144.0.0.0', '2026-02-01 18:35:35', 3, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
-(4, 3, 3, 3, 'checkin', -6.6015006, 106.7942450, 'uploads/attendance/checkin_3_3_1770015659.jpg', 'Mozilla/5.0 (Linux; Android 13; SM-G981B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Mobile Safari/537.36 Edg/144.0.0.0', '2026-02-02 14:00:59', 3, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0);
+(1, 2, 2, 3, 'checkin', -6.6015006, 106.7942450, 'uploads/attendance/checkin_3_3_1769943711.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 07:28:45', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0),
+(2, 2, 2, 3, 'checkout', -6.6013100, 106.7891102, 'uploads/attendance/checkin_4_3_1770289595.jpg', 'Android 13 | Samsung A34 | Chrome Mobile', '2026-01-30 17:38:10', 0, '0000-00-00 00:00:00', 0, '0000-00-00 00:00:00', 0);
 
 -- --------------------------------------------------------
 
@@ -444,7 +452,44 @@ INSERT INTO `refresh_tokens` (`id`, `user_id`, `token`, `expires_at`, `created_a
 (246, 3, 'b3fe667a15d31b151ae9903e78dc01a66fafa1494ba259fe1989149cddf3bc72981612ff697dd3a514602cc5f5c41cd4eb39614be6cc1431237d066e0b2f8514', '2026-03-06 16:45:55', '2026-02-04 16:45:55'),
 (247, 3, '3a1d8abd2657bb6c9bf0b9c68eb8488c41c21c38817d1365f81c553b7ee3f6831e710651671721189c25e041072779c79350c42e892f9695522c0f944db13f5e', '2026-03-06 16:46:11', '2026-02-04 16:46:11'),
 (248, 3, '10a4a3ed7fa620500dfd5e8b87ff9aaad8b11a7ea091f68fa4dd72f075378497266225bb5fe3fecd9bfd5ae1c01992d9a368750e75c29f3bbb6c6986bab25d71', '2026-03-06 16:46:36', '2026-02-04 16:46:36'),
-(249, 3, 'da0eada94b26dfcd45cf3a6bac5ff7ecf38380bd324238a1a0f2f7e6f85880b10edd3dff3c8c6d7c27bb8a9f69ef215dae1cf37c2d9435e651b57e59c79a2ccc', '2026-03-06 16:47:18', '2026-02-04 16:47:18');
+(249, 3, 'da0eada94b26dfcd45cf3a6bac5ff7ecf38380bd324238a1a0f2f7e6f85880b10edd3dff3c8c6d7c27bb8a9f69ef215dae1cf37c2d9435e651b57e59c79a2ccc', '2026-03-06 16:47:18', '2026-02-04 16:47:18'),
+(250, 2, 'b54034bc0df5ba2810574a2bf13291af9ac69def5e5c9efbdeb11b13ae077c2b58aeba7c6ce7325c054c432bc5b88514129c7ad665516a7476d83743a238f8ec', '2026-03-07 16:46:09', '2026-02-05 16:46:09'),
+(251, 2, '0115cd0d4e2654f03c697ad29d03a66f3e385fea64d631aaf9b7dd5684b51aa28ebbf0ba7d4a577c6b80c2dce68da9a631a3642ee1beebae4da3ed39800d20f6', '2026-03-07 17:07:23', '2026-02-05 17:07:23'),
+(252, 2, 'be7b3f853c8de47a718dc246a2c7fb9e158a9678a96e893d134c4baf6e16cd14d8b56b593703201d59692ccf142496afa9606c9af74b2ed63971754e95ff0e1b', '2026-03-07 17:21:13', '2026-02-05 17:21:13'),
+(253, 2, '5037414b470d0a2d508c5c6a464b09a7d7738bf9ba188c557c3eba88da3e90a4b0eefffa82064af7eb1449dcc37b518eaaff3c3e77b841cd47e6c3e4cb06bedd', '2026-03-07 17:23:28', '2026-02-05 17:23:28'),
+(254, 3, 'f4c61a6117ea56aad09f3b025655af683e03d82d62d11d8da50cd8d028342a24b328dc6acbc3113eb47f9b341c9155c61cef360fb2e9249be6e13ab74db1a32c', '2026-03-07 17:26:06', '2026-02-05 17:26:06'),
+(255, 3, 'ee32eacad8e3fe9d199b56ec4ef5ffa38ea7ca6756ca8b1f1fadde86893158a5f892476b4a1c2f8c47e8ab0b9c6621ace4a1f51919238fd60a5ef34ffef6c928', '2026-03-07 17:48:43', '2026-02-05 17:48:43'),
+(256, 3, 'c26adf9171c52676739e863d3a9ef9838b0ec4ff4fa9d40cae242f33c9f8e37cfc113b29eb251811bcb90aa3b1f595fdb35bd0d326c89a28a3da866471f438b2', '2026-03-07 17:49:45', '2026-02-05 17:49:45'),
+(257, 3, '58c5ca955168afda18ee6663aa94dec8553c511434bb4b9a2a303f19d5d572d3df52ef3fb7058ffce8398d9f492f23c04dedc9e53c6c05c140ebf23cf7d5a98d', '2026-03-07 17:50:09', '2026-02-05 17:50:09'),
+(258, 3, '87aa78020ae6fdba1a6e4adf3ade10dd88c4e4b3ee1c2d6152021720a67663e4d357434c75ca5a7a3c65da3d02006009375a23ff0f69440b1c732ff8ab765d05', '2026-03-07 18:06:18', '2026-02-05 18:06:18'),
+(259, 3, '6eb1ba04d0c547be7429586717d77588605c1b75e0098466561cf5f14e04fb1baa36d7e29f98ff60ce40d449d0d9af021e5cbfbd9823e4abae4be8079b0cc7ea', '2026-03-07 18:08:12', '2026-02-05 18:08:12'),
+(260, 3, 'ecd2cdc3d41c2b74055fedaa6ab068d04237614155177fd2f9267c4a9d871c35b5c4b493ab43f5866f550f8f7e1e0cf9710abdbb2758f0540eda74318d0a2036', '2026-03-07 18:09:27', '2026-02-05 18:09:27'),
+(261, 3, '1b2681d335a4276b9b68c4656d3f3276d589a30ebcf0159f1d9325789b857e1f2d29e65c2e5fd468258f00dfb4bc160bb131ea6b460660c1b80026da429c3f9d', '2026-03-07 18:10:29', '2026-02-05 18:10:29'),
+(262, 3, 'd41a1192f0c10f69a039377fee9debfe7fa344331c7bd6d3441c343182cc8fbcff19acd9eb542797fe7e7444aefb6c5a7770e93172132d0771651ca74e7bf5ab', '2026-03-07 18:38:17', '2026-02-05 18:38:17'),
+(263, 3, '036542a6f30738b722d833a6798f369cce05c890d4524287de65360c49807b00bbf0bbda992798f4ac2edfde98a18c655b1f7e04c6f0a1fd610db2ec1b42973c', '2026-03-07 18:38:36', '2026-02-05 18:38:36'),
+(264, 3, '1574716df39cafa40be5485b4273c5ab730c97051d25cd631776fc6e94fb313a3470f318f40d0e1e3c827f7e12831c5812d7c8e18b11657b43474c9d51241456', '2026-03-07 18:38:42', '2026-02-05 18:38:42'),
+(265, 3, 'fc6ce58cd93909d63cbfb90620d3736652ef04b798f3802527fe4c933b03a3ed338f0f5f12cab10f76073ed48cd63e0d7efdc576df523d710f1fa007669e2b4b', '2026-03-07 18:45:16', '2026-02-05 18:45:16'),
+(266, 3, '058bf9ed4cc7e9a42c176def055fda84ce2c5af94a99c5ff25b2aee140ce8d6b1cc6a3359df791712b40203225504a10e99597bb503b7e2e704ef253f21c2485', '2026-03-07 18:45:37', '2026-02-05 18:45:37'),
+(267, 3, '66fabc7ce48219294be76a4107c1346a57243937d4ad6ebf8cf7cb19aec807be2524c957804cd858e4a899de3f257d8296d0f96897331f98198c1dd493b8749a', '2026-03-07 18:46:27', '2026-02-05 18:46:27'),
+(268, 3, '1b1bd140ab7e010fff2edfd9c0745d987628fdd6583943395215da480a73ccc77a425987a8741795a8f8bdffc598b2dc808ba17760f66383fd01f74deec02e30', '2026-03-07 18:48:53', '2026-02-05 18:48:53');
+INSERT INTO `refresh_tokens` (`id`, `user_id`, `token`, `expires_at`, `created_at`) VALUES
+(269, 3, '97b2af415c5b0976bd80c7c261bdd4c97ed30d57aa3bce870abfc13b445cdff932aa4300af2c8c0070b308563d1102930ee1e913c9562362afc916b2cf1e55ae', '2026-03-07 18:49:14', '2026-02-05 18:49:14'),
+(270, 3, '74d57a7a526bb6cf8a489ceb56cdd13540ed6ad2b7ba128972f7ef7e2e5b1bc2a4f529749dae1a07a55d881fc58fd478dbb1f6b7a7edccd7f2f2a8ae567e55b5', '2026-03-07 18:49:31', '2026-02-05 18:49:31'),
+(271, 3, 'da10b9ff49a3820dd3ac48c63420fb4e1dba4d316c0b409fd94c5d8f99aa2958d647fa2a10fc48dc057437cd1afbfa77ba5c82d15b3ffba39ca870dc81e1c8c8', '2026-03-07 18:49:45', '2026-02-05 18:49:45'),
+(272, 3, '0b221eaef82667e3e73ba594016f82109c6e5a3f4b39afd79e2e3ec98a6f5778f7f99e039a1b97e69389c350f09a7cef81327a1e0cc0b2ee4b0c91a23b0378da', '2026-03-07 18:50:15', '2026-02-05 18:50:15'),
+(273, 3, '4dd878ec1c90fb83eabdce2efb8cb46d134b491cf9945c2d005d7f4eb683df3a0e785f1edfe3a5d1767297007ce125dbb7e0da75933717d360f9008a5734a50f', '2026-03-07 18:53:12', '2026-02-05 18:53:12'),
+(274, 3, 'bbc74e6b73da186ace2a7c387a09028592d55a6961162d1ec45f272427e796354c67ce9b9655ff1596e00ae48a323a877b13b28dc0a09430aec066197d3d7973', '2026-03-07 18:53:53', '2026-02-05 18:53:53'),
+(275, 3, '629fcad4ed35cf18272d28ecd47a781d3ab81c99d36fac5bb51d7a0a516b9be3eb39b5ef5437d4df0e10994b7df84287d772d1b667fae2253e3821dc9e1e8fde', '2026-03-07 18:54:54', '2026-02-05 18:54:54'),
+(276, 3, 'a786e97670513447d226f936d4fa95a09a8ca223afa613e4c9201db30674d3f3db6e8cfeb7d99d69c190d5641d003bb10ed3f0ea6082dbcf33d4affbd64bee8e', '2026-03-07 19:04:37', '2026-02-05 19:04:37'),
+(277, 3, 'af9eea149c3a21095b12b707a96b2a987b4d91725d5330f57d90b07fd7107af42cb967de520cc9f13cf6b80a1276feda3fa1f83d43eb61941eb174931015105b', '2026-03-07 19:04:55', '2026-02-05 19:04:55'),
+(278, 3, 'b7929a4b8b3c1a3131f596a2c91fa640cf7b846c019a123adf2419a034efcf02ded04383525745148f7b3d1270dcfbb0e6a6f0956881344404a428f442e1b801', '2026-03-08 14:35:18', '2026-02-06 14:35:18'),
+(279, 3, 'a19e6f990f56f8e988ffdb22d3d4adbcff18e095dd83d37caba2c5f8c07cc607a5c9191be0300cd6fce8a5b9752c54b39875d7f3477f35f07673434b95ab115d', '2026-03-08 14:45:14', '2026-02-06 14:45:14'),
+(280, 3, 'ca4721f694474c516da4c0620a0fe13d580bce58443ac71dd0d77dc4a72648aa2adc7231ae4d2764457fed4fb57ed423f98bda571dc33ec0cd3840d337ce7666', '2026-03-08 14:47:26', '2026-02-06 14:47:26'),
+(281, 3, '1673f10c8cba558d826d27eaeae2dccb622c2e8e51036bd9699baef06855bb77825b7ec38584669e11db05a4556c547e0c7a9347252ab070de6e932d0eccc7f8', '2026-03-08 16:31:10', '2026-02-06 16:31:10'),
+(282, 1, 'c113714dc2b251deac48ec9de45ff286ca201467421260c232d64e4e32a97886cbf64720ad1c45bfad0604561ceb2672905e2ed904704523bd15f6ec553b8804', '2026-03-08 16:31:57', '2026-02-06 16:31:57'),
+(283, 1, '7152a6fe651687457335b96def78f2dbbc5b55eb15ab526638ae8aeb34962ec8b72075b3a53dcad277eabeea51e98679324a38101025969b285d89862d1f39cf', '2026-03-08 16:32:19', '2026-02-06 16:32:19'),
+(284, 1, '6c3a3e8bb9fb9d39e15aa987a4a881a7ced6effdc22db0b0ee400e83aadf86388e5d6ec6ad558cfa0b856429ca33724c902327289446320c7004bffa93ab9f97', '2026-03-08 16:33:08', '2026-02-06 16:33:08'),
+(285, 1, 'b30005d41c3c301f2400f674c95eb020b6219e840b8be4595e908ac0aede4174f2a7c30da4575dc1ca26e97225f13787d5671c8921aa37c841a88bd79896b2cf', '2026-03-08 16:33:55', '2026-02-06 16:33:55');
 
 -- --------------------------------------------------------
 
@@ -510,7 +555,8 @@ INSERT INTO `skills` (`id`, `name`, `category`, `created_at`, `created_by`, `upd
 (39, 'Purchasing Staff', 'Purchasing', '2026-01-18 00:54:00', 1, NULL, NULL, NULL, NULL),
 (40, 'Hotel Manager', 'Management', '2026-01-18 00:54:00', 1, NULL, NULL, NULL, NULL),
 (41, 'Operation Manager', 'Management', '2026-01-18 00:54:00', 1, NULL, NULL, NULL, NULL),
-(42, 'General Manager', 'Management', '2026-01-18 00:54:00', 1, NULL, NULL, NULL, NULL);
+(42, 'General Manager', 'Management', '2026-01-18 00:54:00', 1, NULL, NULL, NULL, NULL),
+(43, 'Food & Beverage Manager', 'Management', '2026-01-18 00:54:00', 1, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -520,7 +566,7 @@ INSERT INTO `skills` (`id`, `name`, `category`, `created_at`, `created_by`, `upd
 
 CREATE TABLE `users` (
   `id` int(1) NOT NULL,
-  `hotel_id` int(11) NOT NULL,
+  `hotel_id` int(1) NOT NULL,
   `role` enum('worker','hotel_hr','hotel_fo','hotel_hk','hotel_fnb_service','hotel_fnb_production','admin') DEFAULT 'worker',
   `name` varchar(100) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
@@ -545,8 +591,9 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `hotel_id`, `role`, `name`, `email`, `phone`, `password`, `provider`, `provider_id`, `photo`, `is_verified`, `is_active`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
 (1, 0, 'worker', 'Mick Jagger', 'admin@admin.com', '0812', '$2y$10$TYZN8k0YxaB.jxCtqA4sl.JnllEeN3/UF9oGYK5.LTvbGlCe7HE82', 'local', NULL, NULL, 0, 'active', '2026-01-18 12:25:53', 1, NULL, NULL, NULL, NULL),
-(2, 0, 'worker', 'Arya Seftian', 'yerblues6@gmail.com', '895330907220', '$2y$10$ziaDpWwWk3gBjVGu6XqmoebCqmePQwtuwaRGY5ggXBpOI/.Wubhq.', 'local', NULL, 'uploads/profiles/profile_2_1768811928.png', 0, 'active', '2026-01-18 18:59:55', NULL, '2026-01-19 08:38:48', NULL, NULL, NULL),
-(3, 0, 'admin', 'Muhammad', 'muhammad@gmail.com', '99988776', '$2y$10$relLlluCofLYvJKJDW65zuxFadTF4X4A.mCur9V2uEbiZVW8vGhaa', 'local', NULL, 'uploads/profiles/profile_3_1768820480.png', 0, 'active', '2026-01-19 10:53:08', NULL, '2026-02-03 10:39:03', NULL, NULL, NULL);
+(2, 1, 'hotel_hr', 'Arya Seftian', 'yerblues6@gmail.com', '895330907220', '$2y$10$ziaDpWwWk3gBjVGu6XqmoebCqmePQwtuwaRGY5ggXBpOI/.Wubhq.', 'local', NULL, 'uploads/profiles/profile_2_1768811928.png', 0, 'active', '2026-01-18 18:59:55', NULL, '2026-01-19 08:38:48', NULL, NULL, NULL),
+(3, 1, 'admin', 'Muhammad', 'muhammad@gmail.com', '99988776', '$2y$10$relLlluCofLYvJKJDW65zuxFadTF4X4A.mCur9V2uEbiZVW8vGhaa', 'local', NULL, 'uploads/profiles/profile_3_1768820480.png', 0, 'active', '2026-01-19 10:53:08', NULL, '2026-02-03 10:39:03', NULL, NULL, NULL),
+(4, 1, 'hotel_fnb_service', 'Muhammad', 'worker@gmail.com', '99988776', '$2y$10$relLlluCofLYvJKJDW65zuxFadTF4X4A.mCur9V2uEbiZVW8vGhaa', 'local', NULL, 'uploads/profiles/profile_3_1768820480.png', 0, 'active', '2026-01-19 10:53:08', NULL, '2026-02-03 10:39:03', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -568,7 +615,9 @@ CREATE TABLE `worker_documents` (
 --
 
 INSERT INTO `worker_documents` (`id`, `user_id`, `type`, `file_path`, `created_at`, `created_by`) VALUES
-(2, 3, 'ktp', 'uploads/documents/doc_3_1770021829.jpeg', NULL, NULL);
+(2, 3, 'ktp', 'uploads/documents/doc_3_1770021829.jpeg', NULL, NULL),
+(3, 3, 'other', 'uploads/documents/doc_3_1770363336.pdf', NULL, NULL),
+(4, 3, 'certificate', 'uploads/documents/doc_3_1770364097.pdf', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -640,6 +689,32 @@ INSERT INTO `worker_experiences` (`id`, `user_id`, `company_name`, `company_busi
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `worker_links`
+--
+
+CREATE TABLE `worker_links` (
+  `id` int(1) NOT NULL,
+  `user_id` int(1) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `url` varchar(250) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL,
+  `created_by` int(1) DEFAULT NULL,
+  `updated_at` datetime DEFAULT NULL,
+  `updated_by` int(1) DEFAULT NULL,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `worker_links`
+--
+
+INSERT INTO `worker_links` (`id`, `user_id`, `name`, `url`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
+(1, 3, 'Perkenalan Diri', 'https://www.youtube.com/watch?v=gLDUZpPUcXA', '2026-02-06 14:26:13', 3, NULL, NULL, NULL, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `worker_profiles`
 --
 
@@ -674,12 +749,14 @@ INSERT INTO `worker_profiles` (`id`, `user_id`, `gender`, `birth_date`, `address
 CREATE TABLE `worker_ratings` (
   `id` int(1) NOT NULL,
   `user_id` int(1) DEFAULT NULL,
-  `comments` int(1) NOT NULL,
+  `job_id` int(1) NOT NULL,
+  `comments` varchar(255) NOT NULL,
   `punctuality` int(1) NOT NULL,
   `apperance` int(1) NOT NULL,
   `knowledge` int(1) NOT NULL,
   `durability` int(1) NOT NULL,
   `ethics` int(1) NOT NULL,
+  `date` date DEFAULT NULL,
   `created_at` datetime NOT NULL,
   `created_by` int(1) NOT NULL,
   `updated_at` datetime DEFAULT NULL,
@@ -687,6 +764,13 @@ CREATE TABLE `worker_ratings` (
   `deleted_at` datetime DEFAULT NULL,
   `deleted_by` int(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `worker_ratings`
+--
+
+INSERT INTO `worker_ratings` (`id`, `user_id`, `job_id`, `comments`, `punctuality`, `apperance`, `knowledge`, `durability`, `ethics`, `date`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
+(1, 3, 3, '0', 3, 3, 3, 4, 5, '2026-02-02', '2026-02-05 16:36:24', 3, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -730,9 +814,9 @@ CREATE TABLE `worker_skills` (
 --
 
 INSERT INTO `worker_skills` (`id`, `user_id`, `skill_id`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
-(25, 3, 13, '2026-02-01 12:28:00', 3, '2026-02-01 12:28:00', NULL, NULL, NULL),
-(26, 3, 1, '2026-02-01 12:28:00', 3, '2026-02-01 12:28:00', NULL, NULL, NULL),
-(27, 3, 9, '2026-02-01 12:28:00', 3, '2026-02-01 12:28:00', NULL, NULL, NULL);
+(28, 3, 13, '2026-02-05 18:08:00', 3, '2026-02-05 18:08:00', NULL, NULL, NULL),
+(29, 3, 5, '2026-02-05 18:08:00', 3, '2026-02-05 18:08:00', NULL, NULL, NULL),
+(30, 3, 9, '2026-02-05 18:08:00', 3, '2026-02-05 18:08:00', NULL, NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -810,6 +894,13 @@ ALTER TABLE `worker_experiences`
   ADD KEY `idx_sort` (`sort_order`);
 
 --
+-- Indexes for table `worker_links`
+--
+ALTER TABLE `worker_links`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `worker_profiles`
 --
 ALTER TABLE `worker_profiles`
@@ -849,19 +940,19 @@ ALTER TABLE `hotels`
 -- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `job_applications`
 --
 ALTER TABLE `job_applications`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `job_attendances`
 --
 ALTER TABLE `job_attendances`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -873,25 +964,25 @@ ALTER TABLE `ratings`
 -- AUTO_INCREMENT for table `refresh_tokens`
 --
 ALTER TABLE `refresh_tokens`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=250;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=286;
 
 --
 -- AUTO_INCREMENT for table `skills`
 --
 ALTER TABLE `skills`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `worker_documents`
 --
 ALTER TABLE `worker_documents`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `worker_educations`
@@ -906,6 +997,12 @@ ALTER TABLE `worker_experiences`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `worker_links`
+--
+ALTER TABLE `worker_links`
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `worker_profiles`
 --
 ALTER TABLE `worker_profiles`
@@ -915,7 +1012,7 @@ ALTER TABLE `worker_profiles`
 -- AUTO_INCREMENT for table `worker_ratings`
 --
 ALTER TABLE `worker_ratings`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `worker_reviews`
@@ -927,7 +1024,7 @@ ALTER TABLE `worker_reviews`
 -- AUTO_INCREMENT for table `worker_skills`
 --
 ALTER TABLE `worker_skills`
-  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

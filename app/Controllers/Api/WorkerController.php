@@ -471,7 +471,7 @@ class WorkerController extends BaseController
                 ->setJSON(['message' => 'Invalid file type']);
         }
 
-        if ($file->getSize() > 5 * 1024 * 1024) {
+        if ($file->getSize() > 10 * 1024 * 1024) {
             return $this->response
                 ->setStatusCode(400)
                 ->setJSON(['message' => 'Max file size 5MB']);

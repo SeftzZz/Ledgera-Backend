@@ -156,7 +156,8 @@ class Application extends BaseAdminController
                 wp.gender,
                 wp.birth_date,
                 wp.address,
-                wp.bio
+                wp.bio,
+                u.photo,
             ')
             ->join('users u', 'u.id = ja.user_id')
             ->join('worker_profiles wp', 'wp.user_id = u.id', 'left')
@@ -189,6 +190,7 @@ class Application extends BaseAdminController
                                 ->join('skills s', 's.id = ws.skill_id')
                                 ->where('ws.user_id', $userId)
                                 ->get()->getResultArray(),
+            'links'       => $db->table('worker_links')->where('user_id', $userId)->get()->getResultArray(),
             'rating'      => $db->table('worker_ratings')->where('user_id', $userId)->get()->getRowArray()
         ]);
     }

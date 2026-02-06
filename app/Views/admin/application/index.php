@@ -66,44 +66,56 @@
 
                                     <div class="modal-body">
 
-                                        <!-- BASIC PROFILE -->
-                                        <h6 class="mb-2">Basic Information</h6>
-                                        <table class="table table-bordered mb-4">
-                                            <tbody>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <td id="wd_name"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Email</th>
-                                                    <td id="wd_email"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Phone</th>
-                                                    <td id="wd_phone"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Gender</th>
-                                                    <td id="wd_gender"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Birth Date</th>
-                                                    <td id="wd_birth"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Address</th>
-                                                    <td id="wd_address"></td>
-                                                </tr>
-                                                <tr>
-                                                    <th>Bio</th>
-                                                    <td id="wd_bio"></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="row mb-4">
 
-                                        <!-- DOCUMENT -->
-                                        <h6 class="mb-2">Documents</h6>
-                                        <div id="wd_documents" class="row g-3 mb-4"></div>
+                                          <!-- FOTO PROFIL (COL 4) -->
+                                          <div class="col-md-4 text-center">
+                                            <img
+                                              id="wd_photo"
+                                              src="<?= base_url('assets/img/avatars/default.png') ?>"
+                                              class="img-fluid rounded mb-2"
+                                              style="max-height: 200px; object-fit: cover;"
+                                              alt="Worker Photo">
+
+                                            <div class="fw-semibold mt-2" id="wd_name_preview">-</div>
+                                            <small class="text-muted">Worker Photo</small>
+                                          </div>
+
+                                          <!-- BASIC INFORMATION (COL 8) -->
+                                          <div class="col-md-8">
+                                            <table class="table table-sm table-bordered mb-0">
+                                              <tr>
+                                                <th width="35%">Name</th>
+                                                <td id="wd_name">-</td>
+                                              </tr>
+                                              <tr>
+                                                <th>Email</th>
+                                                <td id="wd_email">-</td>
+                                              </tr>
+                                              <tr>
+                                                <th>Phone</th>
+                                                <td id="wd_phone">-</td>
+                                              </tr>
+                                              <tr>
+                                                <th>Gender</th>
+                                                <td id="wd_gender">-</td>
+                                              </tr>
+                                              <tr>
+                                                <th>Birth Date</th>
+                                                <td id="wd_birth">-</td>
+                                              </tr>
+                                              <tr>
+                                                <th>Address</th>
+                                                <td id="wd_address">-</td>
+                                              </tr>
+                                              <tr>
+                                                <th>Bio</th>
+                                                <td id="wd_bio">-</td>
+                                              </tr>
+                                            </table>
+                                          </div>
+
+                                        </div>
 
                                         <!-- EDUCATION -->
                                         <h6 class="mb-2">Educations</h6>
@@ -135,7 +147,23 @@
 
                                         <!-- SKILLS -->
                                         <h6 class="mb-2">Skills</h6>
-                                        <div id="wd_skills" class="d-flex flex-wrap gap-2"></div>
+                                        <div id="wd_skills" class="d-flex flex-wrap gap-2 mb-4"></div>
+
+                                        <!-- DOCUMENT -->
+                                        <h6 class="mb-2">Documents</h6>
+                                        <div id="wd_documents" class="row g-3 mb-4"></div>
+
+                                        <!-- LINKS -->
+                                        <h6 class="mb-2">Links</h6>
+                                        <table class="table table-striped mb-4">
+                                            <thead>
+                                                <tr>
+                                                    <th>Name</th>
+                                                    <th>Url</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="wd_links"></tbody>
+                                        </table>
 
                                         <!-- RATINGS -->
                                         <h6 class="mt-4 mb-2">Ratings</h6>
@@ -334,22 +362,43 @@
                                         $('#wd_address').text(u.address ?? '-');
                                         $('#wd_bio').text(u.bio ?? '-');
 
+                                        // preview name bawah foto
+                                        $('#wd_name_preview').text(u.name ?? '-');
+
+                                        // FOTO PROFIL
+                                        if (u.photo) {
+                                          $('#wd_photo').attr('src', `<?= base_url() ?>/${u.photo}`);
+                                        } else {
+                                          $('#wd_photo').attr('src', `<?= base_url('assets/img/avatars/default.png') ?>`);
+                                        }
+
                                         /* ===============================
                                            DOCUMENTS
                                         =============================== */
                                         $('#wd_documents').html(
-                                            (res.documents ?? []).length
-                                                ? res.documents.map(d => `
-                                                    <div class="col-md-3">
-                                                        <a href="<?= base_url() ?>/${d.file_path}" target="_blank">
-                                                            <img class="img-fluid rounded" src="<?= base_url() ?>/${d.file_path}">
-                                                        </a>
-                                                        <small class="d-block text-center mt-1">
-                                                            ${(d.type || '').toUpperCase()}
-                                                        </small>
-                                                    </div>
-                                                `).join('')
-                                                : '<div class="text-muted">No documents</div>'
+                                          (res.documents ?? []).length
+                                            ? res.documents.map(d => {
+
+                                                const fullUrl = `<?= base_url() ?>/${d.file_path}`;
+                                                const fileName = d.file_path.split('/').pop(); // ambil nama file saja
+
+                                                const shortName =
+                                                  fileName.length > 20
+                                                    ? fileName.substring(0, 20) + '...'
+                                                    : fileName;
+
+                                                return `
+                                                  <div class="col-md-3">
+                                                    <a href="${fullUrl}" target="_blank" title="${fileName}">
+                                                      ${shortName}
+                                                    </a>
+                                                    <small class="d-block text-center mt-1">
+                                                      ${(d.type || '').toUpperCase()}
+                                                    </small>
+                                                  </div>
+                                                `;
+                                              }).join('')
+                                            : '<div class="text-muted">No documents</div>'
                                         );
 
                                         /* ===============================
@@ -393,6 +442,20 @@
                                                     `<span class="badge bg-primary me-1">${s.name}</span>`
                                                   ).join('')
                                                 : '<span class="text-muted">No skills</span>'
+                                        );
+
+                                        /* ===============================
+                                           LINKS
+                                        =============================== */
+                                        $('#wd_links').html(
+                                            (res.links ?? []).length
+                                                ? res.links.map(l => `
+                                                    <tr>
+                                                        <td>${l.name}</td>
+                                                        <td><a href="${l.url}" target="_blank">${l.url}</a></td>
+                                                    </tr>
+                                                `).join('')
+                                                : '<span class="text-muted">No links</span>'
                                         );
 
                                         /* ===============================

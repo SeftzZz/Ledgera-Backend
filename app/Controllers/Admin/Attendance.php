@@ -58,6 +58,9 @@ class Attendance extends BaseAdminController
                 IFNULL(users.name, '-') AS worker_name,
                 IFNULL(hotels.hotel_name, '-') AS hotel_name,
                 IFNULL(jobs.position, '-') AS position,
+                jobs.start_time,
+                jobs.end_time,
+                jobs.fee,
                 MIN(CASE WHEN job_attendances.type = 'checkin' THEN job_attendances.created_at END) AS checkin_time,
                 MAX(CASE WHEN job_attendances.type = 'checkout' THEN job_attendances.created_at END) AS checkout_time,
                 job_attendances.user_id,
@@ -112,26 +115,46 @@ class Attendance extends BaseAdminController
             $duration      = '-';
             $tenMinutesCnt = '-';
             $status        = 'Incomplete';
+            $rate          = '-';
 
             if ($checkin && $checkout) {
-                $seconds  = strtotime($checkout) - strtotime($checkin);
-                $minutes  = floor($seconds / 60);
 
-                $duration      = gmdate('H:i', $seconds);
-                $tenMinutesCnt = floor($minutes / 10); // jumlah kelipatan 10 menit
-                $status        = 'Complete';
+                $seconds = strtotime($checkout) - strtotime($checkin);
+                $minutesWorked = floor($seconds / 60);
+
+                // ✅ FIX DI SINI
+                $duration = gmdate('H:i', $seconds);
+                $status   = 'Complete';
+
+                $tenMinutesCnt = floor($minutesWorked / 10);
+
+                // ==========================
+                // HITUNG TOTAL SLOT JOB
+                // ==========================
+                $jobStart = strtotime($row['start_time']);
+                $jobEnd   = strtotime($row['end_time']);
+
+                $jobMinutes = ($jobEnd - $jobStart) / 60;
+                $jobTenMin  = floor($jobMinutes / 10);
+
+                if ($jobTenMin > 0 && $row['fee'] > 0) {
+                    $ratePer10Min = $row['fee'] / $jobTenMin;
+                    $rate = round($tenMinutesCnt * $ratePer10Min);
+                }
             }
+
 
             $data[] = [
                 'no'          => $no++.'.',
                 'date'        => date('d-m-Y', strtotime($row['work_date'])),
                 'worker'      => esc($row['worker_name']),
-                'hotel'       => esc($row['hotel_name']),
+                // 'hotel'       => esc($row['hotel_name']),
                 'job'         => esc($row['position']),
                 'checkin'     => $checkin ? date('H:i', strtotime($checkin)) : '-',
                 'checkout'    => $checkout ? date('H:i', strtotime($checkout)) : '-',
                 'duration'    => $duration,
                 'ten_minutes' => $tenMinutesCnt,
+                'rate'        => $rate !== '-' ? number_format($rate, 0, ',', '.') : '-',
                 'status'      => $status,
                 'action'      => '
                     <button 

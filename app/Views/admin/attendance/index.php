@@ -34,13 +34,13 @@
                                                 <th>No.</th>
                                                 <th>Date</th>
                                                 <th>Worker</th>
-                                                <th>Hotel</th>
+                                                <!-- <th>Hotel</th> -->
                                                 <th>Job</th>
                                                 <th>Check In</th>
                                                 <th>Check Out</th>
                                                 <th>Duration (Hours)</th>
                                                 <th>10 Min Count</th>
-                                                <!-- <th>Fee</th> -->
+                                                <th>Rate</th>
                                                 <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
@@ -216,12 +216,13 @@
                                             { data: 'no' },
                                             { data: 'date' },
                                             { data: 'worker' },
-                                            { data: 'hotel' },
+                                            // { data: 'hotel' },
                                             { data: 'job' },
                                             { data: 'checkin' },
                                             { data: 'checkout' },
                                             { data: 'duration' },
                                             { data: 'ten_minutes' },
+                                            { data: 'rate' },
                                             { data: 'status' },
                                             { data: 'action' }
                                         ],
@@ -229,6 +230,12 @@
                                         columnDefs: [
                                             { targets: 0, className: 'control', orderable: false, searchable: false },
                                             { targets: 1, orderable: false, searchable: false },
+                                            {
+                                                targets: 9,
+                                                render: function (data) {
+                                                    return data !== '-' ? 'Rp ' + data : '-';
+                                                }
+                                            },
                                             {
                                                 targets: 10,
                                                 render: function (data) {

@@ -2,17 +2,17 @@
 <html
     lang="en" class="light-style layout-navbar-fixed layout-menu-fixed layout-compact"
     dir="ltr" data-theme="theme-default"
-    data-assets-path="../assets/" data-template="vertical-menu-template-no-customizer">
+    data-assets-path="assets/" data-template="vertical-menu-template-no-customizer">
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-        <title><?= $title ?> | Hey! Work</title>
+        <title><?= $title ?> | Ledgera</title>
 
         <meta name="description" content="hey work connects hospitality professionals with trusted hotels for flexible daily and casual job opportunities." />
 
         <!-- Favicon -->
-        <link rel="icon" type="image/x-icon" href="<?= base_url('assets/img/favicon/favicon.png') ?>" />
+        <link rel="icon" type="image/x-icon" href="<?= base_url('assets/img/favicon/favicon.ico') ?>" />
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -99,21 +99,7 @@
         <!-- Vendors JS -->
         <script src="<?= base_url('assets/vendor/libs/sweetalert2/sweetalert2new.js') ?>"></script>
         <?= $this->renderSection('scripts') ?>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-              let amountIndex = 0;
-              const amountItems = document.querySelectorAll('#amount-rotator .amount-item');
-
-              if (!amountItems.length) return;
-
-              setInterval(() => {
-                amountItems[amountIndex].classList.remove('active');
-                amountIndex = (amountIndex + 1) % amountItems.length;
-                amountItems[amountIndex].classList.add('active');
-              }, 5000);
-            });
-        </script>
-
+        
         <!-- Page JS -->
     </body>
 </html>

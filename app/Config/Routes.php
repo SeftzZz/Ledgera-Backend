@@ -5,133 +5,178 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->options('(:any)', function () {
-    return response()
-        ->setStatusCode(200);
-});
+
+// =========================
+// GLOBAL
+// =========================
+$routes->options('(:any)', fn () => response()->setStatusCode(200));
 
 $routes->get('/', 'Home::index');
 
-/* =========================
- * AUTH
- * ========================= */
+$routes->post('ping', fn () =>
+    response()->setJSON([
+        'ok' => true,
+        'method' => service('request')->getMethod(),
+    ])
+);
+
+
+
+// =========================
+// AUTH (WEB)
+// =========================
 $routes->get('login', 'Auth\Login::index');
 $routes->post('login', 'Auth\Login::auth');
 $routes->get('logout', 'Auth\Login::logout');
 
-$routes->group('admin', ['filter' => 'auth'], function($routes) {
-    $routes->get('dashboard', 'Admin\Dashboard::index');
-    $routes->get('dashboard/calendar', 'Admin\Dashboard::calendar', ['filter' => 'role:admin,hotel_hr']);
-    $routes->get('dashboard/calendar-attendance/(:num)', 'Admin\Dashboard::attendanceByJob/$1', ['filter' => 'role:admin,hotel_hr']);
 
-    $routes->get('hotels', 'Admin\Hotels::index', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('hotels/datatable', 'Admin\Hotels::datatable', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('hotels/store', 'Admin\Hotels::store', ['filter' => 'role:admin']);
-    $routes->post('hotels/get', 'Admin\Hotels::getById', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('hotels/update', 'Admin\Hotels::update', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('hotels/delete', 'Admin\Hotels::delete', ['filter' => 'role:admin']);
+// DASHBOARD (WEB)
+$routes->get('dashboard', 'DashboardController::index', ['filter' => 'auth']);
 
-    $routes->get('attendance', 'Admin\Attendance::index', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('attendance/datatable', 'Admin\Attendance::datatable', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('attendance/detail', 'Admin\Attendance::detail', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('attendance/rate', 'Admin\Attendance::submitRating', ['filter' => 'role:admin,hotel_hr']);
-
-    $routes->get('users', 'Admin\Users::index', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('users/datatable', 'Admin\Users::datatable', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('users/store', 'Admin\Users::store', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('users/get', 'Admin\Users::getById', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('users/update', 'Admin\Users::update', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('users/delete', 'Admin\Users::delete', ['filter' => 'role:admin,hotel_hr']);
-
-    $routes->get('application', 'Admin\Application::index', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('application/datatable', 'Admin\Application::datatable', ['filter' => 'role:admin,hotel_hr']);
-    $routes->get('application/worker/(:num)', 'Admin\Application::workerDetail/$1', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('application/update-status', 'Admin\Application::updateStatus', ['filter' => 'role:admin,hotel_hr']);
-
-    $routes->get('job-vacancies', 'Admin\JobVacancies::index', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('job-vacancies/datatable', 'Admin\JobVacancies::datatable', ['filter' => 'role:admin,hotel_hr']);
-    $routes->post('job-vacancies/store', 'Admin\JobVacancies::store', ['filter' => 'role:admin,hotel_hr']);
-    $routes->get('job-vacancies/skills', 'Admin\JobVacancies::skills', ['filter' => 'role:admin,hotel_hr']);
+// USER (WEB)
+$routes->group('', ['filter' => 'auth'], function ($routes) {
+    $routes->get('users', 'UserController::index',['filter' => 'permission:users.view']);
+    $routes->post('users/datatable', 'UserController::datatable',['filter' => 'permission:users.view']);
+    $routes->post('users/store', 'UserController::store', ['filter' => 'permission:users.create']);
+    $routes->post('users/get', 'UserController::getById', ['filter' => 'permission:users.edit']);
+    $routes->post('users/update', 'UserController::update', ['filter' => 'permission:users.edit']);
+    $routes->post('users/delete', 'UserController::delete', ['filter' => 'permission:users.delete']);
 });
 
-$routes->group('api', function($routes) {
-    $routes->post('auth/login', 'Api\AuthController::login');
-    $routes->post('auth/google', 'Api\AuthController::google');
-    $routes->post('auth/facebook', 'Api\AuthController::facebook');
+// COA (WEB)
+$routes->group('coa', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'CoaController::index', ['filter' => 'permission:coa.view']);
+    $routes->post('datatable', 'CoaController::datatable', ['filter' => 'permission:coa.view']);
+    $routes->post('store', 'CoaController::store', ['filter' => 'permission:coa.create']);
+    $routes->post('get', 'CoaController::get', ['filter' => 'permission:coa.edit']);
+    $routes->post('update', 'CoaController::update', ['filter' => 'permission:coa.edit']);
+    $routes->post('delete', 'CoaController::delete', ['filter' => 'permission:coa.delete']);
+});
+
+// equity
+$routes->group('equity', ['filter' => 'auth'], function ($routes) {
+    $routes->get('/', 'EquityController::index');
+    $routes->post('datatable', 'EquityController::datatable');
+    $routes->post('store', 'EquityController::store');
+    $routes->post('update', 'EquityController::update');
+    $routes->post('delete', 'EquityController::delete');
+    $routes->post('get', 'EquityController::get');
+    $routes->get('opening-balance', 'EquityController::openingBalance');
+    $routes->post('opening-balance/save', 'EquityController::saveOpeningBalance');
+
+});
+
+// $routes->group('equity', ['filter' => 'auth'], function ($routes) {
+//     $routes->get('/', 'EquityController::index', ['filter' => 'permission:equity.view']);
+//     $routes->post('datatable', 'EquityController::datatable', ['filter' => 'permission:equity.view']);
+//     $routes->post('store', 'EquityController::store', ['filter' => 'permission:equity.create']);
+//     $routes->post('update', 'EquityController::update', ['filter' => 'permission:equity.edit']);
+//     $routes->post('delete', 'EquityController::delete', ['filter' => 'permission:equity.delete']);
+//     $routes->post('get', 'EquityController::get');
+//     $routes->get('opening-balance', 'EquityController::openingBalance', ['filter' => 'permission:equity.create']);
+//     $routes->post('opening-balance/save', 'EquityController::saveOpeningBalance', ['filter' => 'permission:equity.create']);
+// });
+
+
+
+
+// =========================
+// API – PUBLIC
+// =========================
+$routes->group('api', function ($routes) {
+    $routes->post('auth/login',    'Api\AuthController::login');
     $routes->post('auth/register', 'Api\AuthController::register');
-    $routes->post('auth/refresh', 'Api\AuthController::refresh');
+    $routes->post('auth/refresh',  'Api\AuthController::refresh');
 });
 
-$routes->group('api', ['filter' => 'jwt'], function($routes) {
+// =========================
+// API – PROTECTED (JWT)
+// =========================
+$routes->group('api', ['filter' => 'jwt'], function ($routes) {
+    // Login & Logout
+    $routes->post('loginrefresh',   'API\AuthController::refresh');
+    $routes->post('logout',         'API\AuthController::logout');
+    $routes->post('logout-all',     'API\AuthController::logoutAll');
 
-    // =========================
-    // WORKER PROFILE
-    // =========================
-    $routes->get('worker/profile', 'Api\WorkerController::profile');
-    $routes->put('worker/profile', 'Api\WorkerController::updateProfile');
-    $routes->get('worker/me', 'Api\WorkerController::me');
+    // Companies
+    $routes->get('companies',            'Api\CompanyController::index');
+    $routes->post('companies',           'Api\CompanyController::store');
+    $routes->get('companies/(:num)',     'Api\CompanyController::show/$1');
+    $routes->put('companies/(:num)',     'Api\CompanyController::update/$1');
 
-    // =========================
-    // WORKER SKILLS
-    // =========================
-    $routes->get('worker/skills', 'Api\WorkerController::skills');
-    $routes->get('worker/my-skills', 'Api\WorkerController::mySkills');
-    $routes->post('worker/skills', 'Api\WorkerController::setSkills');
+    // Branches
+    $routes->get('branches',              'Api\BranchController::index');
+    $routes->post('branches',             'Api\BranchController::store');
+    $routes->get('branches/(:num)',       'Api\BranchController::show/$1');
 
-    // =========================
-    // WORKER DATA
-    // =========================
-    $routes->get('worker/jobs', 'Api\WorkerController::jobs');
-    $routes->post('worker/experience', 'Api\WorkerController::addExperience');
-    $routes->get('worker/experience', 'Api\WorkerController::experiences');
-    $routes->post('worker/education', 'Api\WorkerController::addEducation');
-    $routes->get('worker/education', 'Api\WorkerController::educations');
+    // Fiscal Years
+    $routes->get('fiscal-years',                   'Api\FiscalYearController::index');
+    $routes->post('fiscal-years',                  'Api\FiscalYearController::store');
+    $routes->post('fiscal-years/(:num)/activate',  'Api\FiscalYearController::activate/$1');
 
-    $routes->post('worker/upload/photo', 'Api\WorkerController::uploadPhoto');
-    $routes->post('worker/upload/document', 'Api\WorkerController::uploadDocument');
-    $routes->get('worker/documents', 'Api\WorkerController::documents');
+    // Accounting Periods
+    $routes->get('periods',                 'Api\AccountingPeriodController::index');
+    $routes->post('periods',                'Api\AccountingPeriodController::store');
+    $routes->post('periods/(:num)/close',   'Api\AccountingPeriodController::close/$1');
+    $routes->post('periods/(:num)/open',    'Api\AccountingPeriodController::open/$1');
 
-    // =========================
-    // APPLICATION
-    // =========================
-    $routes->get('worker/application-list', 'Api\WorkerController::applicationList');
-    $routes->get('worker/applications', 'Api\WorkerController::applications');
-    $routes->get('worker/applications/(:num)', 'Api\WorkerController::applicationDetail/$1');
+    // Accounts
+    $routes->get('accounts',            'Api\AccountController::index');
+    $routes->post('accounts',           'Api\AccountController::store');
+    $routes->get('accounts/tree',       'Api\AccountController::tree');
+    $routes->get('accounts/(:num)',     'Api\AccountController::show/$1');
+    $routes->put('accounts/(:num)',     'Api\AccountController::update/$1');
 
-    // =========================
-    // ATTENDANCE 🔥 (FIXED)
-    // =========================
+    // Business Partners
+    $routes->get('partners',            'Api\BusinessPartnerController::index');
+    $routes->post('partners',           'Api\BusinessPartnerController::store');
+    $routes->get('partners/(:num)',     'Api\BusinessPartnerController::show/$1');
 
-    // list attendance (schedule)
-    // optional: ?date=YYYY-MM-DD
-    $routes->get('worker/attendance', 'Api\WorkerController::attendance');
+    // Transactions
+    $routes->get('transactions',        'Api\TransactionController::index');
+    $routes->post('transactions',       'Api\TransactionController::store');
+    $routes->get('transactions/(:num)', 'Api\TransactionController::show/$1');
 
-    // attendance by job
-    $routes->get('worker/attendance/job/(:num)', 'Api\WorkerController::attendanceByJob/$1');
+    // Journals
+    $routes->get('journals',                    'Api\JournalController::index');
+    $routes->post('journal',                    'API\JournalController::create', ['filter' => 'permission:journal.create']);
+    // $routes->post('journals',                   'Api\JournalController::store');
+    $routes->get('journals/(:num)',             'Api\JournalController::show/$1');
+    $routes->post('journals/(:num)/submit',     'Api\JournalController::submit/$1');
+    $routes->post('journals/(:num)/approve',    'Api\JournalApprovalController::approve/$1');
+    $routes->post('journals/(:num)/reject',     'Api\JournalApprovalController::reject/$1');
+    $routes->post('journals/(:num)/post',       'Api\JournalController::post/$1');
+    $routes->post('journals/(:num)/reverse',    'Api\JournalController::reverse/$1');
 
-    // check-in / check-out
-    $routes->post('worker/attendance/checkin', 'Api\WorkerController::checkin');
-    $routes->post('worker/attendance/checkout', 'Api\WorkerController::checkout');
+    // Taxes
+    $routes->get('taxes',   'Api\TaxController::index');
+    $routes->post('taxes',  'Api\TaxController::store');
 
-    // =========================
-    // RATING
-    // =========================
-    $routes->post('worker/rating', 'Api\RatingController::submit');
-    $routes->get('worker/ratings', 'Api\RatingController::myRatings');
+    // Journal Taxes
+    $routes->post('journal-taxes', 'Api\JournalTaxController::store');
 
-    // =========================
-    // JOB (PUBLIC DATA)
-    // =========================
-    $routes->get('worker/most-popular', 'Api\WorkerController::mostPopular');
-    $routes->get('skills', 'Api\WorkerController::skills');
+    // Sub Ledgers
+    $routes->get('sub-ledgers/ar',    'Api\SubLedgerController::accountsReceivable');
+    $routes->get('sub-ledgers/ap',    'Api\SubLedgerController::accountsPayable');
+    $routes->get('sub-ledgers/aging', 'Api\SubLedgerController::aging');
 
-    $routes->get('jobs', 'Api\JobController::index');
-    $routes->get('jobs/(:num)', 'Api\JobController::show/$1');
-    $routes->post('jobs/(:num)/apply', 'Api\JobController::apply/$1');
-    $routes->post('jobs', 'Api\JobController::create');
+    // Reports
+    $routes->get('reports/profit-loss',     'Api\ReportController::profitLoss');
+    $routes->get('reports/balance-sheet',   'Api\ReportController::balanceSheet');
+    $routes->get('reports/cash-flow',       'Api\ReportController::cashFlow');
+    $routes->get('reports/branch/(:num)',   'Api\ReportController::byBranch/$1');
+    $routes->get('reports/consolidated',    'Api\ReportController::consolidated');
 
-    // =========================
-    // COMPANY
-    // =========================
-    $routes->get('company/hotels', 'Api\CompanyController::index');
+    // Audit
+    $routes->get('audit',            'Api\AuditController::index');
+    $routes->get('audit/(:num)',     'Api\AuditController::show/$1');
+
+    // Export
+    $routes->get('export/journals',        'Api\ExportController::journals');
+    $routes->get('export/profit-loss',     'Api\ExportController::profitLoss');
+    $routes->get('export/balance-sheet',   'Api\ExportController::balanceSheet');
+
+    // System
+    $routes->get('system/health',       'Api\SystemController::health');
+    $routes->get('system/permissions',  'Api\SystemController::permissions');
 });

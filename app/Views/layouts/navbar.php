@@ -8,67 +8,67 @@
                         </div>
 
                         <div class="navbar-nav-right d-flex align-items-center" id="navbar-collapse">
-                            <!-- Info hotel -->
+                            <!-- Info Company -->
                             <?php
-                                use App\Models\HotelModel;
-                                $hotelId      = session()->get('hotel_id') ?? 0;
+                                use App\Models\CompanyModel;
+                                $companyId      = session()->get('company_id') ?? 0;
 
                                 // Default
-                                if ($hotelId == 0) {
-                                    $hotelName    = 'Hey Work Corp';
-                                    $hotelLoc     = 'Bogor, West Java';
-                                    $hotelWebsite = 'www.heywork.com';
-                                    $hotelLogo    = 'images/heywork48.png';
+                                if ($companyId == 0) {
+                                    $companyName    = 'Ledgera Apps';
+                                    $companyLoc     = 'Jakarta, Indonesia';
+                                    $companyWebsite = 'www.ledgera.com';
+                                    $companyLogo    = 'uploads/logos/Logo-48.png';
                                 }
 
-                                if ($hotelId != 0) {
-                                    $hotelModel = new HotelModel();
-                                    $hotel = $hotelModel
-                                        ->select('hotel_name, location, website, logo')
-                                        ->where('id', $hotelId)
+                                if ($companyId != 0) {
+                                    $companyModel = new CompanyModel();
+                                    $company = $companyModel
+                                        ->select('company_name, company_addr, company_web, company_logo')
+                                        ->where('id', $companyId)
                                         ->first();
 
-                                    if ($hotel) {
-                                        $hotelName    = $hotel['hotel_name'];
-                                        $hotelLoc     = $hotel['location'];
-                                        $hotelWebsite = $hotel['website'];
-                                        $hotelLogo    = $hotel['logo'];
+                                    if ($company) {
+                                        $companyName    = $company['company_name'];
+                                        $companyLoc     = $company['company_addr'];
+                                        $companyWebsite = $company['company_web'];
+                                        $companyLogo    = $company['company_logo'];
                                     }
                                 }
 
-                                // Inisial hotel
-                                $hotelInitials = '';
-                                foreach (explode(' ', $hotelName) as $w) {
+                                // Inisial Company
+                                $companyInitials = '';
+                                foreach (explode(' ', $companyName) as $w) {
                                     if ($w !== '') {
-                                        $hotelInitials .= strtoupper(substr($w, 0, 1));
+                                        $companyInitials .= strtoupper(substr($w, 0, 1));
                                     }
                                 }
-                                $hotelInitials = substr($hotelInitials, 0, 2);
+                                $companyInitials = substr($companyInitials, 0, 2);
                             ?>
 
                             <div class="navbar-nav align-items-center">
                                 <div class="d-flex align-items-center gap-2">
                                     <!-- Logo / Initial -->
                                     <div class="avatar avatarNav-sm">
-                                        <?php if (!empty($hotelLogo) && file_exists(FCPATH . $hotelLogo)): ?>
-                                            <img src="<?= base_url($hotelLogo) ?>" class="rounded-circleColor" />
+                                        <?php if (!empty($companyLogo) && file_exists(FCPATH . $companyLogo)): ?>
+                                            <img src="<?= base_url($companyLogo) ?>" class="rounded-circleColor" />
                                         <?php else: ?>
                                             <span class="avatar-initial rounded-circle bg-label-primary">
-                                                <?= esc($hotelInitials) ?>
+                                                <?= esc($companyInitials) ?>
                                             </span>
                                         <?php endif; ?>
                                     </div>
 
-                                    <!-- Hotel Info -->
+                                    <!-- Company Info -->
                                     <div class="d-none d-md-flex flex-column lh-sm">
-                                        <span class="fw-medium text-body"><?= esc($hotelName) ?></span>
-                                        <small class="text-muted"><?= esc($hotelLoc) ?></small>
+                                        <span class="fw-medium text-body"><?= esc($companyName) ?></span>
+                                        <small class="text-muted"><?= esc($companyLoc) ?></small>
                                     </div>
 
                                     <!-- Website -->
-                                    <?php if (!empty($hotelWebsite)): ?>
-                                        <a href="<?= 'https://' . esc($hotelWebsite) ?>" target="_blank" class="ms-2 text-body d-none d-lg-inline">
-                                            <i class="ti ti-world ti-md"></i><?= esc($hotelWebsite) ?>
+                                    <?php if (!empty($companyWebsite)): ?>
+                                        <a href="<?= 'https://' . esc($companyWebsite) ?>" target="_blank" class="ms-2 text-body d-none d-lg-inline">
+                                            <i class="ti ti-world ti-md"></i><?= esc($companyWebsite) ?>
                                         </a>
                                     <?php endif; ?>
                                 </div>
@@ -76,24 +76,6 @@
                             <!-- /Info hotel -->
 
                             <ul class="navbar-nav flex-row align-items-center ms-auto">
-                                <!-- Amount -->
-                                <?php if ((int) session()->get('hotel_id') !== 0): ?>
-                                    <li class="nav-item me-2 me-xl-1">
-                                        <div id="amount-rotator">
-                                            <span class="amount-item active">
-                                                <i class="ti ti-coin ti-md me-1"></i>
-                                                Balance: <strong>Rp.0</strong>
-                                            </span>
-
-                                            <span class="amount-item">
-                                                <i class="ti ti-cash ti-md me-1"></i>
-                                                Usage Amt: <strong>Rp.0</strong>
-                                            </span>
-                                        </div>
-                                    </li>
-                                <?php endif; ?>
-                                <!--/ Amount -->
-
                                 <!-- Language -->
                                 <!-- <li class="nav-item dropdown-language dropdown me-2 me-xl-0">
                                     <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);" data-bs-toggle="dropdown">
@@ -303,14 +285,5 @@
                                 </li>
                                 <!--/ User -->
                             </ul>
-                        </div>
-
-                        <!-- Search Small Screens -->
-                        <div class="navbar-search-wrapper search-input-wrapper d-none">
-                            <input type="text"
-                            class="form-control search-input container-xxl border-0"
-                            placeholder="Search..."
-                            aria-label="Search..." />
-                                <i class="ti ti-x ti-sm search-toggler cursor-pointer"></i>
                         </div>
                     </nav>

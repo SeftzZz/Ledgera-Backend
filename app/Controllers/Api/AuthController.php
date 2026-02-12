@@ -1,186 +1,201 @@
 <?php
 
-namespace App\Controllers\Api;
+namespace App\Controllers\API;
 
 use App\Controllers\BaseController;
-use App\Models\UserModel;
-use App\Models\RefreshTokenModel;
-use App\Libraries\JwtService;
-use Google\Client as GoogleClient;
+use Firebase\JWT\JWT;
+use Config\JWT as JWTConfig;
 
 class AuthController extends BaseController
 {
-    protected $user;
-    protected $jwtService;
-    protected $refreshModel;
-
-    public function __construct()
+    public function login()
     {
-        $this->user = new UserModel();
-        $this->jwtService = new JwtService();
-        $this->refreshModel = new RefreshTokenModel();
-    }
+        $email    = $this->request->getPost('email');
+        $password = $this->request->getPost('password');
 
-    private function issueToken(array $user)
-    {
-        $accessToken  = $this->jwtService->generateAccessToken((object) $user);
-        $refreshToken = $this->jwtService->generateRefreshToken();
+        $user = $this->db->table('users')
+            ->where('email', $email)
+            ->where('is_active', 1)
+            ->get()
+            ->getRow();
 
-        $this->refreshModel->insert([
-            'user_id'    => $user['id'],
+        if (! $user || ! password_verify($password, $user->password)) {
+            return $this->failUnauthorized('Invalid credentials');
+        }
+
+        // Ambil permission
+        $permissions = $this->getUserPermissions($user->id);
+
+        $jwtConfig = new JWTConfig();
+
+        $payload = [
+            'iss' => $jwtConfig->issuer,
+            'iat' => time(),
+            'exp' => time() + $jwtConfig->expire,
+            'sub' => $user->id,
+            'company_id' => $user->company_id,
+            'branch_id'  => $user->branch_id,
+            'permissions'=> $permissions
+        ];
+
+        $token = JWT::encode($payload, $jwtConfig->key, $jwtConfig->algo);
+        $refreshToken = bin2hex(random_bytes(40));
+
+        $this->db->table('refresh_tokens')->insert([
+            'user_id'    => $user->id,
             'token'      => $refreshToken,
-            'expires_at' => date(
-                'Y-m-d H:i:s',
-                time() + config('JWT')->refreshTokenTTL
-            ),
+            'expires_at' => date('Y-m-d H:i:s', strtotime('+14 days')),
             'created_at' => date('Y-m-d H:i:s')
         ]);
 
-        return $this->response->setJSON([
-            'access_token'  => $accessToken,
+        return $this->respond([
+            'token' => $token,
+            'access_token'  => $token,
             'refresh_token' => $refreshToken,
-            'expires_in'    => config('JWT')->accessTokenTTL,
-            'user'          => $user
+            'expires_in'    => $jwtConfig->expire,
+            'user'          => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'company_id' => $user->company_id,
+                'branch_id' => $user->branch_id
+            ],
+            'permissions' => $permissions
         ]);
     }
 
-    public function register()
+    private function getUserPermissions(int $userId): array
     {
-        $data = $this->request->getJSON(true);
+        $rows = $this->db->table('user_roles ur')
+            ->select("CONCAT(p.module,'.',p.action) as permission")
+            ->join('roles r', 'r.id = ur.role_id')
+            ->join('role_permissions rp', 'rp.role_id = r.id')
+            ->join('permissions p', 'p.id = rp.permission_id')
+            ->where('ur.user_id', $userId)
+            ->groupBy('permission')
+            ->get()
+            ->getResultArray();
 
-        $this->user->insert([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => password_hash($data['password'], PASSWORD_DEFAULT),
-        ]);
-
-        return $this->response->setJSON(['message' => 'Register success']);
-    }
-
-    public function login()
-    {
-        $data = $this->request->getJSON(true);
-        $user = $this->user->where('email', $data['email'])->first();
-
-        if (!$user || !password_verify($data['password'], $user['password'])) {
-            return $this->response
-                ->setStatusCode(401)
-                ->setJSON(['message' => 'Invalid login']);
-        }
-
-        return $this->issueToken($user);
-    }
-
-    public function google()
-    {
-        $json = $this->request->getJSON(true);
-
-        if (!isset($json['token'])) {
-            return $this->response
-                ->setStatusCode(400)
-                ->setJSON(['message' => 'Token required']);
-        }
-
-        $client = new GoogleClient([
-            'client_id' => env('GOOGLE_CLIENT_ID')
-        ]);
-
-        $payload = $client->verifyIdToken($json['token']);
-
-        if (!$payload) {
-            return $this->response
-                ->setStatusCode(401)
-                ->setJSON(['message' => 'Invalid Google token']);
-        }
-
-        $user = $this->user->where('email', $payload['email'])->first();
-
-        if (!$user) {
-            $id = $this->user->insert([
-                'name'        => $payload['name'] ?? null,
-                'email'       => $payload['email'],
-                'photo'       => $payload['picture'] ?? null,
-                'provider'    => 'google',
-                'provider_id' => $payload['sub'],
-                'is_verified' => 1
-            ]);
-
-            $user = $this->user->find($id);
-        }
-
-        return $this->issueToken($user);
-    }
-
-    public function facebook()
-    {
-        $json = $this->request->getJSON(true);
-
-        if (!isset($json['access_token'])) {
-            return $this->response
-                ->setStatusCode(400)
-                ->setJSON(['message' => 'Access token required']);
-        }
-
-        $url = 'https://graph.facebook.com/me'
-            . '?fields=id,name,email,picture.type(large)'
-            . '&access_token=' . urlencode($json['access_token']);
-
-        $response = file_get_contents($url);
-        $fbUser = json_decode($response, true);
-
-        if (!isset($fbUser['email'])) {
-            return $this->response
-                ->setStatusCode(400)
-                ->setJSON(['message' => 'Facebook email permission required']);
-        }
-
-        $user = $this->user->where('email', $fbUser['email'])->first();
-
-        if (!$user) {
-            $id = $this->user->insert([
-                'name'        => $fbUser['name'] ?? null,
-                'email'       => $fbUser['email'],
-                'photo'       => $fbUser['picture']['data']['url'] ?? null,
-                'provider'    => 'facebook',
-                'provider_id' => $fbUser['id'],
-                'is_verified' => 1
-            ]);
-
-            $user = $this->user->find($id);
-        }
-
-        return $this->issueToken($user);
+        return array_column($rows, 'permission');
     }
 
     public function refresh()
     {
-        $json = $this->request->getJSON(true);
-        $refreshToken = $json['refresh_token'] ?? null;
+        $refreshToken = $this->request->getPost('refresh_token');
 
-        if (!$refreshToken) {
-            return $this->response
-                ->setStatusCode(400)
-                ->setJSON(['message' => 'Refresh token required']);
+        if (! $refreshToken) {
+            return $this->failUnauthorized('Refresh token required');
         }
 
-        $tokenData = $this->refreshModel
+        $tokenRow = $this->db->table('refresh_tokens')
             ->where('token', $refreshToken)
+            ->where('revoked_at', null)
             ->where('expires_at >=', date('Y-m-d H:i:s'))
-            ->first();
+            ->get()
+            ->getRow();
 
-        if (!$tokenData) {
-            return $this->response
-                ->setStatusCode(401)
-                ->setJSON(['message' => 'Invalid refresh token']);
+        if (! $tokenRow) {
+            return $this->failUnauthorized('Invalid refresh token');
         }
 
-        $user = $this->user->find($tokenData['user_id']);
+        $user = $this->db->table('users')
+            ->where('id', $tokenRow->user_id)
+            ->where('is_active', 1)
+            ->get()
+            ->getRow();
 
-        $newAccessToken = $this->jwtService->generateAccessToken((object) $user);
+        if (! $user) {
+            return $this->failUnauthorized();
+        }
 
-        return $this->response->setJSON([
-            'access_token' => $newAccessToken,
-            'expires_in'   => config('JWT')->accessTokenTTL
+        // Ambil permission (boleh cache ulang)
+        $permissions = $this->getUserPermissions($user->id);
+
+        // Generate access token baru
+        $jwtConfig = new \Config\JWT();
+
+        $payload = [
+            'iss' => $jwtConfig->issuer,
+            'iat' => time(),
+            'exp' => time() + $jwtConfig->expire,
+            'sub' => $user->id,
+            'company_id' => $user->company_id,
+            'branch_id'  => $user->branch_id,
+            'permissions'=> $permissions
+        ];
+
+        $accessToken = \Firebase\JWT\JWT::encode(
+            $payload,
+            $jwtConfig->key,
+            $jwtConfig->algo
+        );
+
+        // Rotate refresh token
+        $newRefreshToken = bin2hex(random_bytes(40));
+
+        $this->db->table('refresh_tokens')
+            ->where('id', $tokenRow->id)
+            ->update([
+                'revoked_at' => date('Y-m-d H:i:s')
+            ]);
+
+        $this->db->table('refresh_tokens')->insert([
+            'user_id' => $user->id,
+            'token' => $newRefreshToken,
+            'expires_at' => date('Y-m-d H:i:s', strtotime('+14 days')),
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        return $this->respond([
+            'access_token'  => $accessToken,
+            'refresh_token' => $newRefreshToken,
+            'expires_in'    => $jwtConfig->expire
+        ]);
+    }
+
+    public function logout()
+    {
+        $authHeader = $this->request->getHeaderLine('Authorization');
+        $refreshToken = $this->request->getPost('refresh_token');
+
+        // Blacklist access token
+        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+            $accessToken = str_replace('Bearer ', '', $authHeader);
+
+            $this->db->table('token_blacklists')->insert([
+                'token_hash' => hash('sha256', $accessToken),
+                'expires_at' => date('Y-m-d H:i:s', time() + 3600),
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+        }
+
+        // Revoke refresh token
+        if ($refreshToken) {
+            $this->db->table('refresh_tokens')
+                ->where('token', $refreshToken)
+                ->update([
+                    'revoked_at' => date('Y-m-d H:i:s')
+                ]);
+        }
+
+        return $this->respond([
+            'message' => 'Logged out successfully'
+        ]);
+    }
+
+    public function logoutAll()
+    {
+        $user = service('request')->user;
+
+        // revoke semua refresh token
+        $this->db->table('refresh_tokens')
+            ->where('user_id', $user->sub)
+            ->update([
+                'revoked_at' => date('Y-m-d H:i:s')
+            ]);
+
+        return $this->respond([
+            'message' => 'Logged out from all devices'
         ]);
     }
 }

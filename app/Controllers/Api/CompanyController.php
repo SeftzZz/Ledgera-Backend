@@ -7,18 +7,23 @@ use App\Models\CompanyModel;
 
 class CompanyController extends BaseController
 {
-    protected $companyModel;
-
-    public function __construct()
-    {
-        $this->companyModel = new CompanyModel();
-    }
-
     public function index()
     {
-        $company = $this->companyModel
-            ->findAll();
+        return $this->response->setJSON(
+            (new CompanyModel())->findAll()
+        );
+    }
 
-        return $this->response->setJSON($company);
+    public function store()
+    {
+        $id = (new CompanyModel())->insert($this->request->getJSON(true), true);
+        return $this->response->setJSON(['id' => $id]);
+    }
+
+    public function show($id)
+    {
+        return $this->response->setJSON(
+            (new CompanyModel())->find($id)
+        );
     }
 }

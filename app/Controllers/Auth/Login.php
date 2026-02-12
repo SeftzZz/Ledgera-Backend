@@ -4,62 +4,91 @@ namespace App\Controllers\Auth;
 
 use App\Controllers\BaseController;
 use App\Models\UserModel;
+use App\Services\PermissionService;
 
 class Login extends BaseController
 {
-    protected $users;
+    protected UserModel $userModel;
 
     public function __construct()
     {
-        $this->users = new UserModel();
+        $this->userModel = new UserModel();
     }
 
+    /**
+     * GET /login
+     * Show login page
+     */
     public function index()
     {
+        // Kalau sudah login, langsung ke dashboard
+        if (session()->get('is_logged_in')) {
+            return redirect()->to(base_url('dashboard'));
+        }
+
         return view('auth/login', [
-            'title' => 'Login | Hey! Work'
+            'title' => 'Login'
         ]);
     }
 
+    /**
+     * POST /login
+     * Proses login web (session-based)
+     */
     public function auth()
     {
-        $email = $this->request->getPost('email');
+        $email    = $this->request->getPost('email');
         $password = $this->request->getPost('password');
 
-        $user = $this->users
+        if (! $email || ! $password) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Email dan password wajib diisi');
+        }
+
+        $user = $this->userModel
             ->where('email', $email)
-            ->where('is_active', 'active')
-            ->where('deleted_at', null)
+            ->where('is_active', 1)
             ->first();
 
-        if (!$user) {
-            return redirect()->back()->with('error', 'User not found');
+        if (! $user || ! password_verify($password, $user['password'])) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Email atau password salah');
         }
 
-        if (!$user['is_active']) {
-            return redirect()->back()->with('error', 'User is inactive');
-        }
+        // Ambil permission & cache ke session
+        $permissions = service('permission')->cache($user['id']);
 
-        if (!password_verify($password, $user['password'])) {
-            return redirect()->back()->with('error', 'Incorrect password');
-        }
-
+        // Set session login
         session()->set([
-            'user_id'        => $user['id'],
-            'hotel_id'       => $user['hotel_id'],
-            'user_name'      => $user['name'],
-            'user_role'      => $user['role'],
-            'user_email'     => $user['email'],
-            'user_photo'     => $user['photo'],
-            'isLoggedIn'     => true
+            'user_id'      => $user['id'],
+            'user_name'    => $user['name'],
+            'user_email'   => $user['email'],
+            'company_id'   => $user['company_id'] ?? null,
+            'branch_id'    => $user['branch_id'] ?? null,
+            'permissions'  => $permissions,
+            'is_logged_in' => true,
+            'logged_at'    => date('Y-m-d H:i:s'),
         ]);
 
-        return redirect()->to('/admin/dashboard');
+        // Update last login
+        $this->userModel->update($user['id'], [
+            'last_login_at' => date('Y-m-d H:i:s')
+        ]);
+
+        return redirect()->to(base_url('dashboard'));
     }
 
+    /**
+     * GET /logout
+     * Destroy session
+     */
     public function logout()
     {
         session()->destroy();
-        return redirect()->to('/login');
+
+        return redirect()->to(base_url('login'))
+            ->with('success', 'Anda berhasil logout');
     }
 }

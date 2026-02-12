@@ -10,13 +10,13 @@ class AuthFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login');
+        if (! session()->get('is_logged_in')) {
+            return redirect()->to(base_url('login'));
         }
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
     {
-        // Tidak perlu isi apa-apa
+        //
     }
 }

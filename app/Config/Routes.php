@@ -45,12 +45,12 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 // COA (WEB)
 $routes->group('coa', ['filter' => 'auth'], function ($routes) {
-    $routes->get('/', 'CoaController::index', ['filter' => 'permission:coa.view']);
-    $routes->post('datatable', 'CoaController::datatable', ['filter' => 'permission:coa.view']);
-    $routes->post('store', 'CoaController::store', ['filter' => 'permission:coa.create']);
-    $routes->post('get', 'CoaController::get', ['filter' => 'permission:coa.edit']);
-    $routes->post('update', 'CoaController::update', ['filter' => 'permission:coa.edit']);
-    $routes->post('delete', 'CoaController::delete', ['filter' => 'permission:coa.delete']);
+    $routes->get('/', 'CoaController::index');
+    $routes->post('datatable', 'CoaController::datatable');
+    $routes->post('store', 'CoaController::store');
+    $routes->post('get', 'CoaController::get');
+    $routes->post('update', 'CoaController::update');
+    $routes->post('delete', 'CoaController::delete');
 });
 
 // equity
@@ -94,9 +94,9 @@ $routes->group('api', function ($routes) {
 // =========================
 $routes->group('api', ['filter' => 'jwt'], function ($routes) {
     // Login & Logout
-    $routes->post('loginrefresh',   'API\AuthController::refresh');
-    $routes->post('logout',         'API\AuthController::logout');
-    $routes->post('logout-all',     'API\AuthController::logoutAll');
+    $routes->post('loginrefresh',   'Api\AuthController::refresh');
+    $routes->post('logout',         'Api\AuthController::logout');
+    $routes->post('logout-all',     'Api\AuthController::logoutAll');
 
     // Companies
     $routes->get('companies',            'Api\CompanyController::index');
@@ -139,7 +139,7 @@ $routes->group('api', ['filter' => 'jwt'], function ($routes) {
 
     // Journals
     $routes->get('journals',                    'Api\JournalController::index');
-    $routes->post('journal',                    'API\JournalController::create', ['filter' => 'permission:journal.create']);
+    $routes->post('journals',                    'Api\JournalController::create', ['filter' => 'permission:journal.create']);
     // $routes->post('journals',                   'Api\JournalController::store');
     $routes->get('journals/(:num)',             'Api\JournalController::show/$1');
     $routes->post('journals/(:num)/submit',     'Api\JournalController::submit/$1');

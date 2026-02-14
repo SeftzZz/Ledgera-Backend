@@ -23,7 +23,4 @@ class JournalHeaderModel extends Model
         'reversal_of',
         'reverse_date'
     ];
-
-    protected $useSoftDeletes = true;
-    protected $deletedField   = 'deleted_at';
 }

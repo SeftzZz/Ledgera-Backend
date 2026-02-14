@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Feb 12, 2026 at 10:12 PM
--- Server version: 10.11.10-MariaDB-log
--- PHP Version: 8.3.27
+-- Host: 127.0.0.1
+-- Generation Time: Feb 12, 2026 at 09:07 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -173,17 +173,16 @@ CREATE TABLE `business_partners` (
   `company_id` int(11) DEFAULT NULL,
   `partner_type` enum('customer','vendor') DEFAULT NULL,
   `partner_code` varchar(30) DEFAULT NULL,
-  `partner_name` varchar(100) DEFAULT NULL,
-  `deleted_at` datetime NOT NULL
+  `partner_name` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `business_partners`
 --
 
-INSERT INTO `business_partners` (`id`, `company_id`, `partner_type`, `partner_code`, `partner_name`, `deleted_at`) VALUES
-(1, 1, 'customer', 'C001', 'PT Customer A', '0000-00-00 00:00:00'),
-(2, 1, 'vendor', 'V001', 'PT Vendor B', '0000-00-00 00:00:00');
+INSERT INTO `business_partners` (`id`, `company_id`, `partner_type`, `partner_code`, `partner_name`) VALUES
+(1, 1, 'customer', 'C001', 'PT Customer A'),
+(2, 1, 'vendor', 'V001', 'PT Vendor B');
 
 -- --------------------------------------------------------
 
@@ -360,18 +359,17 @@ CREATE TABLE `journal_headers` (
   `is_locked` tinyint(4) DEFAULT 0,
   `reversal_of` int(11) DEFAULT NULL,
   `reverse_date` date DEFAULT NULL,
-  `created_at` datetime DEFAULT current_timestamp(),
-  `deleted_at` datetime NOT NULL
+  `created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `journal_headers`
 --
 
-INSERT INTO `journal_headers` (`id`, `company_id`, `branch_id`, `fiscal_year_id`, `journal_no`, `journal_date`, `description`, `period_month`, `period_year`, `status`, `is_locked`, `reversal_of`, `reverse_date`, `created_at`, `deleted_at`) VALUES
-(1, 1, 1, 1, 'AUTO-1', '2025-01-10', NULL, 1, 2025, 'draft', 0, NULL, NULL, '2026-02-08 21:02:02', '0000-00-00 00:00:00'),
-(2, 1, 1, 1, 'AUTO-2', '2025-01-15', NULL, 1, 2025, 'draft', 0, NULL, NULL, '2026-02-08 21:02:02', '0000-00-00 00:00:00'),
-(3, 1, 1, 1, 'AUTO-3', '2025-01-10', NULL, 1, 2025, 'draft', 0, NULL, NULL, '2026-02-08 21:03:40', '0000-00-00 00:00:00');
+INSERT INTO `journal_headers` (`id`, `company_id`, `branch_id`, `fiscal_year_id`, `journal_no`, `journal_date`, `description`, `period_month`, `period_year`, `status`, `is_locked`, `reversal_of`, `reverse_date`, `created_at`) VALUES
+(1, 1, 1, 1, 'AUTO-1', '2025-01-10', NULL, 1, 2025, 'draft', 0, NULL, NULL, '2026-02-08 21:02:02'),
+(2, 1, 1, 1, 'AUTO-2', '2025-01-15', NULL, 1, 2025, 'draft', 0, NULL, NULL, '2026-02-08 21:02:02'),
+(3, 1, 1, 1, 'AUTO-3', '2025-01-10', NULL, 1, 2025, 'draft', 0, NULL, NULL, '2026-02-08 21:03:40');
 
 -- --------------------------------------------------------
 
@@ -557,18 +555,17 @@ CREATE TABLE `tax_codes` (
   `tax_code` varchar(20) DEFAULT NULL,
   `tax_name` varchar(100) DEFAULT NULL,
   `tax_type` enum('ppn','withholding') DEFAULT NULL,
-  `tax_rate` decimal(5,2) DEFAULT NULL,
-  `is_active` tinyint(4) DEFAULT 1,
-  `deleted_at` datetime NOT NULL
+  `rate` decimal(5,2) DEFAULT NULL,
+  `is_active` tinyint(4) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tax_codes`
 --
 
-INSERT INTO `tax_codes` (`id`, `tax_code`, `tax_name`, `tax_type`, `tax_rate`, `is_active`, `deleted_at`) VALUES
-(1, 'PPN11', 'PPN 11%', 'ppn', 11.00, 1, '0000-00-00 00:00:00'),
-(2, 'PPh23', 'PPh 23', 'withholding', 2.00, 1, '0000-00-00 00:00:00');
+INSERT INTO `tax_codes` (`id`, `tax_code`, `tax_name`, `tax_type`, `rate`, `is_active`) VALUES
+(1, 'PPN11', 'PPN 11%', 'ppn', 11.00, 1),
+(2, 'PPh23', 'PPh 23', 'withholding', 2.00, 1);
 
 -- --------------------------------------------------------
 
@@ -647,7 +644,7 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `company_id`, `branch_id`, `name`, `email`, `phone`, `password`, `photo`, `is_active`, `last_login_at`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted_at`, `deleted_by`) VALUES
 (1, 0, 0, 'Mick Jagger', 'admin@admin.com', '0812', '$2y$10$TYZN8k0YxaB.jxCtqA4sl.JnllEeN3/UF9oGYK5.LTvbGlCe7HE82', NULL, 'active', '2026-02-12 12:11:18', '2026-01-18 12:25:53', 1, '2026-02-12 12:11:18', NULL, NULL, NULL),
 (2, 1, 0, 'Arya Seftian', 'yerblues6@gmail.com', '895330907220', '$2y$10$relLlluCofLYvJKJDW65zuxFadTF4X4A.mCur9V2uEbiZVW8vGhaa', 'profile_2_1768811928.png', 'active', '2026-02-12 13:56:55', '2026-01-18 18:59:55', 1, '2026-02-12 13:56:55', NULL, NULL, NULL),
-(3, 1, 0, 'Muhammad', 'muhammad@gmail.com', '99988776', '$2y$10$relLlluCofLYvJKJDW65zuxFadTF4X4A.mCur9V2uEbiZVW8vGhaa', 'profile_3_1768820480.png', 'active', '2026-02-12 18:27:10', '2026-01-19 10:53:08', 1, '2026-02-12 18:27:10', NULL, NULL, NULL),
+(3, 1, 0, 'Muhammad', 'muhammad@gmail.com', '99988776', '$2y$10$relLlluCofLYvJKJDW65zuxFadTF4X4A.mCur9V2uEbiZVW8vGhaa', 'profile_3_1768820480.png', 'active', NULL, '2026-01-19 10:53:08', 1, '2026-02-03 10:39:03', NULL, NULL, NULL),
 (4, 1, 0, 'Muhammad', 'worker@gmail.com', '99988776', '$2y$10$relLlluCofLYvJKJDW65zuxFadTF4X4A.mCur9V2uEbiZVW8vGhaa', '1770800774_86ac11607620813dfeb3.png', 'active', NULL, '2026-01-19 10:53:08', 1, '2026-02-11 16:39:18', 2, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -678,14 +675,16 @@ INSERT INTO `user_roles` (`id`, `user_id`, `role_id`, `branch_id`) VALUES
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_export_journal` (
-`journal_no` varchar(50)
-,`journal_date` date
-,`account_code` varchar(20)
-,`account_name` varchar(100)
-,`debit` decimal(18,2)
-,`credit` decimal(18,2)
-,`description` varchar(255)
 );
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vw_export_journal`
+--
+DROP TABLE IF EXISTS `vw_export_journal`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_export_journal`  AS SELECT `jh`.`journal_no` AS `journal_no`, `jh`.`journal_date` AS `journal_date`, `coa`.`account_code` AS `account_code`, `coa`.`account_name` AS `account_name`, `jd`.`debit` AS `debit`, `jd`.`credit` AS `credit`, `jh`.`description` AS `description` FROM ((`journal_headers` `jh` join `journal_details` `jd` on(`jd`.`journal_id` = `jh`.`id`)) join `chart_of_accounts` `coa` on(`coa`.`id` = `jd`.`account_id`)) WHERE `jh`.`status` = 'posted' ;
 
 --
 -- Indexes for dumped tables
@@ -1052,15 +1051,6 @@ ALTER TABLE `users`
 --
 ALTER TABLE `user_roles`
   MODIFY `id` int(1) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
--- --------------------------------------------------------
-
---
--- Structure for view `vw_export_journal`
---
-DROP TABLE IF EXISTS `vw_export_journal`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_export_journal`  AS SELECT `jh`.`journal_no` AS `journal_no`, `jh`.`journal_date` AS `journal_date`, `coa`.`account_code` AS `account_code`, `coa`.`account_name` AS `account_name`, `jd`.`debit` AS `debit`, `jd`.`credit` AS `credit`, `jh`.`description` AS `description` FROM ((`journal_headers` `jh` join `journal_details` `jd` on(`jd`.`journal_id` = `jh`.`id`)) join `coa` on(`coa`.`id` = `jd`.`account_id`)) WHERE `jh`.`status` = 'posted' ;
 
 --
 -- Constraints for dumped tables

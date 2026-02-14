@@ -8,147 +8,109 @@ use App\Models\CoaOpeningBalanceModel;
 
 class EquityController extends BaseController
 {
-    protected CoaModel $coaModel;
-    protected CoaOpeningBalanceModel $openingModel;
+    protected $coa;
+    protected $opening;
 
     public function __construct()
     {
-        $this->coaModel     = new CoaModel();
-        $this->openingModel = new CoaOpeningBalanceModel();
+        $this->coa = new CoaModel();
+        $this->opening = new CoaOpeningBalanceModel();
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | INDEX
-    |--------------------------------------------------------------------------
-    */
     public function index()
     {
-        $companyId = (int) session()->get('company_id');
+        $companyId = session()->get('company_id');
 
-        $builder = $this->coaModel
-            ->where('account_type', 'equity');
+        $builder = $this->coa->where('account_type', 'equity');
 
-        if ($companyId !== 0) {
+        if ($companyId != 0) {
             $builder->where('company_id', $companyId);
         }
 
-        return view('accounting/equity/index', [
-            'title'    => 'Equity',
-            'equities' => $builder->orderBy('account_code', 'ASC')->findAll()
-        ]);
+        $data = [
+            'title'  => 'Equity',
+            'equities' => $builder->findAll()
+        ];
+
+
+        return view('accounting/equity/index', $data);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | STORE EQUITY ACCOUNT
-    |--------------------------------------------------------------------------
-    */
     public function store()
     {
-        $companyId  = (int) session()->get('company_id');
-        $accountCode = trim($this->request->getPost('account_code'));
+        $companyId = session()->get('company_id');
 
-        // VALIDASI UNIK
-        if ($this->coaModel
-            ->where('company_id', $companyId)
-            ->where('account_code', $accountCode)
-            ->first()) {
-
-            return $this->response->setJSON([
-                'status'  => false,
-                'message' => 'Account code already exists'
-            ]);
-        }
-
-        $coaId = $this->coaModel->insert([
+        $coaId = $this->coa->insert([
             'company_id'  => $companyId,
-            'account_code'=> $accountCode,
+            'account_code'=> $this->request->getPost('account_code'),
             'account_name'=> $this->request->getPost('account_name'),
             'account_type'=> 'equity',
-            'parent_id'   => $this->request->getPost('parent_id') ?: null,
-            'is_active'   => $this->request->getPost('is_active') ?? 1,
-            'created_at'  => date('Y-m-d H:i:s'),
-            'created_by'  => session()->get('user_id')
-        ], true);
+            'parent_id'   => $this->request->getPost('parent_id'),
+            'is_active'   => $this->request->getPost('is_active')
+        ]);
+
+        $this->opening->insert([
+            'coa_id'          => $coaId,
+            'company_id'      => $companyId,
+            'opening_balance' => $this->request->getPost('opening_balance'),
+            'period_year'     => date('Y')
+        ]);
 
         return $this->response->setJSON([
-            'status'  => true,
-            'message' => 'Akun equity berhasil ditambahkan',
-            'coa_id'  => $coaId
+            'status' => true,
+            'message'=> 'Akun berhasil ditambahkan'
         ]);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | OPENING BALANCE VIEW
-    |--------------------------------------------------------------------------
-    */
     public function openingBalance()
     {
-        $companyId = (int) session()->get('company_id');
+        $companyId = session()->get('company_id');
 
-        $accounts = $this->coaModel
+        $coaModel = new \App\Models\CoaModel();
+
+        $accounts = $coaModel
             ->where('company_id', $companyId)
             ->where('is_active', 1)
             ->orderBy('account_code', 'ASC')
             ->findAll();
 
         return view('accounting/equity/opening_balance', [
-            'title'    => 'Opening Balance',
+            'title'  => 'Opening Balance',
             'accounts' => $accounts
         ]);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | SAVE OPENING BALANCE
-    |--------------------------------------------------------------------------
-    */
     public function saveOpeningBalance()
     {
-        $companyId = (int) session()->get('company_id');
-        $rows      = $this->request->getJSON(true);
+        $companyId = session()->get('company_id');
+        $data = $this->request->getJSON(true);
 
-        $totalDebit  = 0;
-        $totalCredit = 0;
+        $model = new \App\Models\CoaOpeningBalanceModel();
 
-        foreach ($rows as $row) {
-            $totalDebit  += (float) ($row['debit'] ?? 0);
-            $totalCredit += (float) ($row['credit'] ?? 0);
-        }
+        // delete existing first
+        $model->where('company_id', $companyId)->delete();
 
-        // VALIDASI BALANCE
-        if ($totalDebit !== $totalCredit) {
-            return $this->response->setJSON([
-                'status'  => false,
-                'message' => 'Opening balance not balanced'
-            ]);
-        }
-
-        // HAPUS LAMA
-        $this->openingModel
-            ->where('company_id', $companyId)
-            ->delete();
-
-        foreach ($rows as $row) {
+        foreach ($data as $row) {
 
             if (empty($row['debit']) && empty($row['credit'])) {
                 continue;
             }
 
-            $this->openingModel->insert([
+            $model->insert([
                 'coa_id'     => $row['coa_id'],
                 'company_id' => $companyId,
                 'debit'      => $row['debit'] ?? 0,
-                'credit'     => $row['credit'] ?? 0,
-                'period_year'=> date('Y')
+                'credit'     => $row['credit'] ?? 0
             ]);
         }
 
         return $this->response->setJSON([
-            'status'  => true,
+            'status' => true,
             'message' => 'Opening Balance Saved'
         ]);
     }
+
+
+
 }
+

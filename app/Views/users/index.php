@@ -434,7 +434,7 @@
 							    $('#modalEditUser').on('shown.bs.modal', function () {
 							        initCompanySelect2('#edit_company_user', $(this));
 								    if (!isSuperAdmin) {
-								        $('#edit_company_user').prop('disabled', true);
+								         $('#edit_company_user').prop('disabled', true);
 								    }
 							    });
 

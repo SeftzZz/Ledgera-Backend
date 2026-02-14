@@ -33,6 +33,58 @@ $routes->get('logout', 'Auth\Login::logout');
 // DASHBOARD (WEB)
 $routes->get('dashboard', 'DashboardController::index', ['filter' => 'auth']);
 
+// =========================
+// MASTER DATA
+// =========================
+$routes->group('', ['filter' => 'auth'], function ($routes) {
+
+    // COMPANY
+    $routes->group('company', function ($routes) {
+        $routes->get('/', 'CompanyController::index');
+        $routes->post('datatable', 'CompanyController::datatable');
+        $routes->post('store', 'CompanyController::store');
+    });
+
+    // BRANCH
+    $routes->group('branch', function ($routes) {
+        $routes->get('/', 'BranchController::index');
+        $routes->post('datatable', 'BranchController::datatable');
+        $routes->post('store', 'BranchController::store');
+    });
+
+    // PARTNER
+    $routes->group('partner', ['filter' => 'auth'], function ($routes) {
+        $routes->get('/', 'BusinessPartnerController::index');
+        $routes->post('datatable', 'BusinessPartnerController::datatable');
+        $routes->post('store', 'BusinessPartnerController::store');
+    });
+
+    // TAX CODE
+    $routes->group('tax', ['filter' => 'auth'], function ($routes) {
+        $routes->get('/', 'TaxController::index');
+        $routes->post('datatable', 'TaxController::datatable');
+        $routes->post('store', 'TaxController::store');
+    });
+
+});
+
+// =========================
+// ACCOUNTING
+// =========================
+$routes->group('', ['filter' => 'auth'], function ($routes) {
+
+    // JOURNAL (WEB)
+    $routes->group('journal', ['filter' => 'auth'], function ($routes) {
+        $routes->get('/', 'JournalController::index');
+        $routes->post('datatable', 'JournalController::datatable');
+        $routes->post('store', 'JournalController::store');
+        $routes->post('submit/(:num)', 'JournalController::submit/$1');
+        $routes->post('post/(:num)', 'JournalController::post/$1');
+        $routes->post('reverse/(:num)', 'JournalController::reverse/$1');
+    });
+});
+
+
 // USER (WEB)
 $routes->group('', ['filter' => 'auth'], function ($routes) {
     $routes->get('users', 'UserController::index',['filter' => 'permission:users.view']);
@@ -45,12 +97,12 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 
 // COA (WEB)
 $routes->group('coa', ['filter' => 'auth'], function ($routes) {
-    $routes->get('/', 'CoaController::index', ['filter' => 'permission:coa.view']);
-    $routes->post('datatable', 'CoaController::datatable', ['filter' => 'permission:coa.view']);
-    $routes->post('store', 'CoaController::store', ['filter' => 'permission:coa.create']);
-    $routes->post('get', 'CoaController::getById', ['filter' => 'permission:coa.edit']);
-    $routes->post('update', 'CoaController::update', ['filter' => 'permission:coa.edit']);
-    $routes->post('delete', 'CoaController::delete', ['filter' => 'permission:coa.delete']);
+    $routes->get('/', 'CoaController::index');
+    $routes->post('datatable', 'CoaController::datatable');
+    $routes->post('store', 'CoaController::store');
+    $routes->post('get', 'CoaController::get');
+    $routes->post('update', 'CoaController::update');
+    $routes->post('delete', 'CoaController::delete');
 });
 
 // equity
@@ -94,15 +146,16 @@ $routes->group('api', function ($routes) {
 // =========================
 $routes->group('api', ['filter' => 'jwt'], function ($routes) {
     // Login & Logout
-    $routes->post('loginrefresh',   'API\AuthController::refresh');
-    $routes->post('logout',         'API\AuthController::logout');
-    $routes->post('logout-all',     'API\AuthController::logoutAll');
+    $routes->post('loginrefresh',   'Api\AuthController::refresh');
+    $routes->post('logout',         'Api\AuthController::logout');
+    $routes->post('logout-all',     'Api\AuthController::logoutAll');
 
     // Companies
     $routes->get('companies',            'Api\CompanyController::index');
     $routes->post('companies',           'Api\CompanyController::store');
     $routes->get('companies/(:num)',     'Api\CompanyController::show/$1');
     $routes->put('companies/(:num)',     'Api\CompanyController::update/$1');
+    $routes->delete('companies/(:num)',  'Api\CompanyController::delete/$1');
 
     // Branches
     $routes->get('branches',              'Api\BranchController::index');
@@ -139,7 +192,7 @@ $routes->group('api', ['filter' => 'jwt'], function ($routes) {
 
     // Journals
     $routes->get('journals',                    'Api\JournalController::index');
-    $routes->post('journal',                    'API\JournalController::create', ['filter' => 'permission:journal.create']);
+    $routes->post('journals',                    'Api\JournalController::create', ['filter' => 'permission:journal.create']);
     // $routes->post('journals',                   'Api\JournalController::store');
     $routes->get('journals/(:num)',             'Api\JournalController::show/$1');
     $routes->post('journals/(:num)/submit',     'Api\JournalController::submit/$1');
